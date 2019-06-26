@@ -1,0 +1,31 @@
+{
+  "name": "jsonix-support-l-lpq",
+  "version": "1.0.0",
+  "description": "troubleshooting inifinite loop issue in Jsonix with LoansPQ CLF XSD",
+  "main": "test.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jabez007/jsonix-support.git"
+  },
+  "keywords": [
+    "Jsonix",
+    "LoansPQ",
+    "XSD",
+    "CLF"
+  ],
+  "author": "Jimmy McCann",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jabez007/jsonix-support/issues"
+  },
+  "homepage": "https://github.com/jabez007/jsonix-support#readme",
+  "dependencies": {
+    "jsonix": "^3.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^6.1.4"
+  }
+}

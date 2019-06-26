@@ -1,0 +1,4308 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Modification history:
+5.225 - Removed doc_stamp_fee_funding_method from GROUP_DOC_STAMPS_FIELDS, removed filing_fee_funding_method from GROUP_CUNA_FIELDS
+5.224 - Added borrower_1_index, borrower_2_index, borrower_1_is_spouse, and borrower_2_is_spouse to the INSURNACE_OPTIONS node
+5.223 - Added combined_secured_aggregate_amount_with_lender_no_mortgage
+5.222 - Changed is_ssn_taxid in CONTACTS to be base_YN
+5.221 - Added app_subtype to BASE_LOAN_INFO
+5.220 - Added is_hmda_exempt_monthly_income_base_salary to MONTHLY_INCOME  and is_hmda_exempt to OTHER_INCOME
+5.219 - Added new id_verification_result values INVALIDSSN and MINOR and new qualifile_decision values CONSUMER and INVALIDSSN under EFUNDS_INFO
+5.218 - Added doc_stamp_fee_funding_method to GROUP_DOC_STAMPS_FIELDS, filing_fee_funding_method to GROUP_CUNA_FIELDS, 
+		funding_method to ATO and fee_linking_type to BASE_DISBURSEMENT_FEE
+5.217 - Added is_possible_dupe_manual to BASE_LOAN_INFO and XPRESS_LOAN_INFO
+5.216 - Added new id_verification_result value NODECISION under EFUNDS_INFO
+5.215 - Add officer_use_loan_date_for_LOC_expiration and consumer_use_loan_date_for_LOC_expiration to mortgage_loan.xsd
+5.214 - Added is_concurrent_closing to CURRENT_TRUST_DEED
+5.213 - Added primary_money_market_link_id to ATM_CARD_TYPE
+5.212 - Added Address Element to BASE_BRANCH
+5.211 - Added Reference ID to Disbursements
+5.210 - Added MName and Suffix to Business Beneficial Owners
+5.209 - Added is_applied and is_required to Tasks to indicate if the task should be applied/required in reguards to the advanced conditioning
+5.208 - Added ComplexType BASE_BUSINESS_COMPANY_INFO which is the same as previous BUSINESS_COMPANY_INFO. Move is_high_risk_business from BASE_BUSINESS_COMPANY_INFO to BUSINESS_COMPANY_INFO.
+        BUSINESS_COMPANY_INFO will represent the business company only instead of both business company and business guarantors. Business guarantor will use BASE_BUSINESS_COMPANY_INFO.
+        The following fields are for specific feature only. Made APPLICANTS optional in BUSINESS_LOAN. Add BUSINESS_DENIAL_REASON, business_custom_score, business_custom_score_2, business_paper_grade and is_business_declined to BUSINESS_COMPANY_INFO
+5.207 - Add lenders_protection_certificate_number for vehicle insurance
+5.206 - Add is_ofac_istwatch to BENEFICIAL_OWNERS
+5.205 - Add interview_method to MORTGAGE_BASE_APPLICANT. Move existing interview_method attribute from LOAN_INFO to APPLICANT AND SPOUSE elements
+5.202 - Add MAPR and IsCalculateMAPR in mortgage_loan.xsd
+5.200   Rename Citizenship to is_citizen
+5.199 - Add AdditionalItemsBackEnd and rename AdditionalItems -> AdditionalItemsFrontEnd, to BL Vehicle and VL
+5.198 - Add beneficial owners
+5.197 - Added business_account_type_id, business_account_type_code in xpress_loan to support new Business Account Roles.
+5.196 - added mailing_address, mailing_city, mailing_state, mailing_zip to CARD_HOLDER element for CC/HELOC
+5.195 - Rename HELOC_CARDS -> HELOC_CARD_HOLDERS, CARD_INFO -> CARD_HOLDER, middle_initial -> m_initial, added max lengths to first_name and last_name of card holders, and added card_account_number, is_ofac_istwatch, istwatch_transactiondate, internal_card_holder_id to card holders
+5.194 - Move all CC card holder attributes to CARD_HOLDERS element list which is a child of LOAN_INFO
+5.193 - Added internal_business_guarantor_id to business guarantors
+5.192 - added several new business-related card holder fields
+5.191 - added business guarantors
+5.190 - removed four first_card fields from card info, renamed ADDITIONAL_CARD_HOLDERS to CARD_HOLDERS, added is_ofac_istwatch and istwatch_transactiondate to CARD_HOLDERS, added internal_card_holder_id to CARD_HOLDERS for internal use
+5.189 - added vehicle_value_types
+5.188 - Added support for up to 20 other incomes. Removed monthly_income_other_1, monthly_income_other_description_1, is_tax_exempt_income_other_1, monthly_income_other_2, monthly_income_other_description_2, is_tax_exempt_income_other_2 moving forward and separated it into a separate OTHER_INCOME element with attributes monthly_income, monthly_income_description, is_tax_exempt.
+5.187 - Removed 'assignto_reference_id', 'assignto_teller_number', 'assignto_terminal_id', 'complete_reference_id', 'complete_teller_number', 'complete_terminal_id', 'create_reference_id', 'create_teller_number', 'create_terminal_id', 'dueloan_reference_id', 'dueloan_teller_number', 'dueloan_terminal_id' to TASK nodes in TASK_LIST node. Added ASSIGNTO, COMPLETE, CREATE, DUELOAN nodes to the TASK node (type BASE_PARTY). Added 'terminal_id' to BASE_PARTY type.
+5.186 - Added 'issue_date' for certificate asset, Added 'issue_date', 'expiration_date' for savings account Asset
+5.185 - Added 'assignto_reference_id', 'assignto_teller_number', 'assignto_terminal_id', 'complete_reference_id', 'complete_teller_number', 'complete_terminal_id', 'create_reference_id', 'create_teller_number', 'create_terminal_id', 'dueloan_reference_id', 'dueloan_teller_number', 'dueloan_terminal_id' to TASK nodes in TASK_LIST node
+5.184 - Added PROFESSIONAL CORPORATION, PUBLIC FUNDS, NON-MEMBER, IOLTA, UAHROF, GOVERNMENT, TRUST
+5.183 - Added 'product_reference_id' to the LOAN_INFO node
+5.182 - Allowed multiple CURRENT_EMPLOYMENT nodes. ALSO, added 'OTHER' to gender enumeration. (the gender enum was done after other versions were added to the CLF, but needed to hotfix demo for Q32017)
+5.181 - Added 'officer_is_interest_only_payments', 'officer_is_other_non_amortizing', 'officer_is_send_na_hmda', 'officer_prepayment_term', 'consumer_is_interest_only_payments', 'consumer_is_other_non_amortizing', 'consumer_is_send_na_hmda', 'consumer_prepayment_term' to LOAN_INFO tag for ML/HE
+5.180 - Added TRUST to contact type for non-ML/HE
+5.179 - Added 'title' attribute to BASE_PARTY type
+5.178 - Added 'paac' attribute to CONTACT_INFO tag
+5.177 - Changed is_minor to base_YN type
+5.176 - Added PRD, PRA to loan statuses enum. Added MNL to property_types enum.
+5.175 - Added BASE_HMDA_XML
+5.174 - Added leasing fields: funding_agreed_upon_value, funding_money_factor, funding_allowable_annual_mileage, funding_equivalent_interest_rate, funding_tax_rate
+5.173 - Added leasing field of max_lease_payment
+5.172 - Added is_high_risk_business to BUSINESS_COMPANY_INFO element for business loans, to COMPANY_INFO_TYPE element for XA. Added is_high_risk_business and is_high_risk_consumer_manual to BUSINESS_LOAN and XPRESS_LOAN_INFO
+5.171 - Added reference_id2, deluxe_org_reporting_unit, ews_org_reporting_unit to BRANCH
+5.170 - Added leasing fields: CustomerMoneyFactor, LenderMoneyFactor, ResidualValue, GrossCapCost, AcquisitionFee, AdjustedCapCost and LeasePayment
+5.169 - Make CONTACT_INFO/@contact_type required
+5.168 - Added flood_is_escrow, hazard_is_escrow
+5.167 - Added last_pulled_date to BASE_INSURANCE. Added GAP_LAST_PULLED_OFFICER and SC_LAST_PULLED_OFFICER to VEHICLE_SYSTEM. Added INSURANCE_LAST_PULLED_OFFICER to BASE_SYSTEM. 
+5.166 - Added is_bah_included 
+5.165 - Added mla_covered_status and mla_covered_date to XA Applicant
+5.164 - Add optional attribute "cuna_client_id" to the LENDER system element
+5.161 - Remove "" enumeration from BASE_DISBURSEMENT_CHECK check_status
+5.160 - Added account number to second, third, and fourth additional card holders
+5.159 - Added is_high_risk_consumer to BASE_APPLICANT and XPRESS_BASE_APPLICANT, added is_high_risk_consumer and is_high_risk_consumer_manual to BASE_LOAN_INFO and XPRESS_LOAN_INFO
+5.157 - Added MAPR fields
+5.156 - added is_financed_property for assets
+5.155 - added AMD Approved/Member Declined for Xpress
+5.154 - added purchaser attr for BASE_HMDA_INFO ( used by VL and PL only)
+5.153 - added enconding attr for condition set under task list
+5.151 - added loan task list
+5.150 - Added WebMS, LoanEvent History
+5.149 - Add CFIO Closed for Incompleteness Other to loan statuses enum
+5.148 - Added UserDefined4 UserDefined5 to GFE_AGGREGATE_ADJUSTMENT_INFOS
+5.147 - Add Other Employment Description, Other Occupancy Description
+5.146 - added flood and homeowners insurance to proposed insurances
+5.144 - added employment_end_date to PREVIOUS_EMPLOYMENT
+5.143 - replaced vehicle insurance insurance agent, company and phone with insurance_agent_contact_id. Added INSAGENT contact type
+5.142 - Added lifetime cap to ML and HE
+5.141 - added OriginationIP to BASE_SYSTEM
+5.140 - added code to BASE_PARTY type
+5.139 - added contact work_phone, address, county, city, state, and zip
+5.138 - removed total_car_price
+5.137 - Add expire date to XA ATM cards
+5.136 - added company nmls and agent nmls
+5.135 - add print_cards_onsite, <number>_card_holder_fee
+5.133 - change total_interest_percent to total_interest_percent_le and add total_interest_percent_cd
+5.132 - Remove the enum restriction from card_type and business_id_type, added missing GIFT_OF_EQUITY from asset_type.
+5.131 - adde gfe CLF
+5.130 - added total_interest_percent, in_five_years_principal, and in_five_years_pimilc to MORTGAGE_FUNDING_INFO
+5.129 - added QualifileReasonCode1-5 and QualifileReasonText1-5, ssn_begin_issue_date, ssn_state_issued 
+5.128 - added bankruptcy_score, is_debit_bureau_required, is_new_customer, incomplete_path, submit_date, monthly_liability, PRICE_ADJUSTMENTS
+5.127 - Remove CVN encrypted
+5.126 - SSFCU modifications.
+5.125 - Added cell_phone_country, fax_number_country, home_phone_country, work_phone_country. Removed is_home_phone_foreign, is_cell_phone_foreign, is_work_phone_foreign, is_fax_number_foreign
+5.124 - Added max_underwrite_amount, is_claimed, is_complete_consumer, require_product_refresh, vehicle_has_proof_insurance
+5.123 - Added not_applicable_race_gender
+5.122 - Removed Payment Info Attributes. Replaced it with BASE_PAYMENT_INFO_CHOICE that can be PAYMENT_COUPON_BOOK_INFO, PAYMENT_PAYROLL_DEDUCTION_INFO, PAYMENT_MANUAL_NO_COUPON_INFO, PAYMENT_TRANSFER_FROM_INTERNAL_ACCOUNT_INFO, PAYMENT_TRANSFER_FROM_OTHER_INSTITUTION_INFO. 
+5.121 - Removed XA Account Funding Source cc_cvn_number from being exported
+5.120 - Added new enum "UTV" as vehicle_type
+5.119 - Added watchlist_reason to vehicle dealerships
+5.117 - Added new enum "UNDECISIONED" as new retail_banking_decision
+5.116 - Added telecheck_score attribute under TELECHECK_INFO, added more enums to telecheck_response_code
+5.115 - Added has_balance_transfer for BL CC
+5.114 - Added PRECISEID_EWS_INFO
+5.113 - Added current card margin
+5.112 - Added new ID card type "CUSTOMER_REFERENCE"
+5.111 - Added new enum "VICTIM MESSAGE" as deluxe_decision
+5.110 - Added response_date, first_approval_date , total_sales_price, rate_expiration_lock_date
+5.109 - Added payment_bank_zip and payment_bank_city. **These new fields are not ready for use yet but it will be by end of 2014.
+5.105 - Added SELLER as contact_type
+5.104 - Added agentContactID to INSURANCE
+5.103 - Added TFOI, TFIA to payment_type. Added payment_account_type, payment_account_number, payment_name_on_account, payment_bank_routing_number, payment_bank_name, payment_bank_state. **These new fields are not ready for use yet but it will be by end of 2014.
+5.102 - Add S Corporation LLC, C Corporation LLC, Partnership LLC, Sole Proprietor LLC
+5.101 - Add primary_reserve_type, primary_reserve_value, secondary_reserve_type, secondary_reserve_value, reserve_type_selection to vehicle processing, and primary_reserve_amount, secondary_reserve_amount to vehicle funding
+5.100 - Add booking_date and booking_reference_id to BASE_LOAN_STATUS and XPRESS_LOAN_INFO
+5.099 - Add address_verification_date to BASE_ADDRESS_LOOSE, remove verification_date from BASE_CURRENT_ADDRESS_CHOICE. Add address_verification_date to XPRESS_BENEFICIARY, add address_verification_date, mailing_address_verification_date to SPECIAL_INFO
+5.098 - Add is_qualified_mortgage_manual to Mortgage Loan Info
+5.097 - Add is_qualified_mortgage to Mortgage Loan Info 
+5.096 - Adde is_ofac to BASE_LOAN_INFO, is_payee_ofac_istwatch, istwatch_transaction_date to BASE_DISBURSEMENT_CHECK; second_card_holder_is_ofac_istwatch, second_card_holder_istwatch_transactiondate, third_card_holder_is_ofac_istwatch, third_card_holder_istwatch_transactiondate, fourth_card_holder_is_ofac_istwatch, fourth_card_holder_istwatch_transactiondate to GROUP_CARD_HOLDER_FIELDS
+5.095 - Added Added APRCashAdvances to CC and BL-CC
+5.094 - Made Assert @ownership_type enumerated
+5.093 - Added payment_type attribute to BASE_DISBURSEMENT_LOAN
+5.092 - Added  APROther and APRBalanceTransfer to BL-CC. also added IntroARP and ExpirationDate to all 3 APR fields on both CC and BL-CC
+5.090 - Added lienholder_account_name_contact_index2 and lienholder_account_name2 to MEMBER_LIEN_PROCESSING
+5.089 - Added card_link_id to ATM_CARD_LINK_TYPE, added cc_card_number to FUNDING_SOURCE
+5.088 - Add fee_description to fee disbursements
+5.087 - skip_payment_template_name , added pledge_rate for pledge value
+5.086 - Added CC current_credit_limit and BL CC current_credit_limit
+5.085 - Added HE other_reason_name
+5.084 - Added combined_unsecured_aggregate_amount_with_lender
+5.083 - add RETAIL_BANKING_INFO
+5.082 - Change SHARE check_purpose attribute to VLD, VLPRD, and VLABD
+5.080 - Added IsHELOC and LoanAmount to Current Trust Deeds
+5.079 - Changed Association abbreviation to ASSN
+5.078 - Added Nonresident Alien as a Citizenship type
+5.076 - 1101PercentageFee 1101PercentageOf 1101FlatFee 1103PercentageFee 1103PercentageOf 1103FlatFee
+5.075 - Removed BASE_ADDRESS type, Removed legacy address attributes from BASE_CURRENT_ADDRESS_CHOICE
+5.074 - Added business indirect loan support
+5.073 - added underwrite_result to GROUP_ACCOUNT_INFO
+5.072 - Changed max size of hmda_msa_number to 20
+5.070 - changed is_owned_by_other attribute to be ownership_type attribute
+5.069 - added check_status attribute to DISBURSEMENTS > CHECK
+5.068 - added bundle_code to GROUP_ACCOUNT_INFO
+5.067 - Added SHARE to check_purpose attribute
+5.066 - Added DocMapper attributes : selectedGuideLines
+5.065 - Removing extra answer_text attribute from BASE_CUSTOM_QUESTIONS
+5.064 - added check_coremitter_contact_index to DISBURSEMENTS > CHECK
+5.063 - added qualifile_score to XPRESS_BASE_APPLICANT
+5.062 - Added contact note attribute for loan contacts
+5.059 - Added CERT_DBA to base_business_id_type
+5.058 - Added is_ofac_bridger to XPRESS_BASE_APPLICANT, COMPANY_INFO_TYPE, SPECIAL_INFO and XPRESS_BENEFICIARY
+5.057 - Added SEC_STATE_CERT to base_business_id_type
+5.055 - Added total_existing_loan_payment to BUSINESS_COMPANY_INFO
+5.054 - Added contact_index
+5.053 - Added is_thin to BASE_APPLICANT
+5.052 - Added ira_type SIMPLEIRA and ira_contribution_type SALARYDEDUCTION
+5.051 - Add is_prequalification_applied to BASE_LOAN
+5.050 - Expanded Suffixes
+5.049 - Add rate_type to PERSONAL_LOAN_INFO 
+5.048 - Removed is_spouse attribute from XPRESS_BENEFICIARY
+5.047 - Added employment_weekly_hours and employment_business_type to BASE_EMPLOYMENT
+5.045 - Added is_fraud_fas to BASE_APPLICANT and XPRESS_BASE_APPLICANT
+5.043 - Remove XA Meta Fields, add fields interest_rate_type, cd_additions_permitted, cd_renewability
+5.042 - Added ORIGINATOR to BASE_SYSTEM
+5.040 - Added DOB, SSN, Mother Maiden Name attributes to card holders
+5.039 - Added relation_to_primary to BASE_APPLICANT and XPRESS_BASE_APPLICANT
+5.037 - Added loan_type to BASE_DISBURSEMENT_LOAN
+5.036 - Added Employment Address, Employment Zip, Employment City, Employment State Supervisor Name and Profession Months to XA FINANCIAL_INFO
+5.035 - Added OTHER to base_employee_of_lender_types
+5.034 - Added current card number rate
+5.033 - Added current card number and purpose type to CC
+5.032 - Added tier and tier_previous to BASE_LOAN_INFO
+5.031 - Added underwrite_submit_date to BASE_LOAN_STATUS
+5.030 - Added payoff_date and interest_per_diem to BASE_DISBURSEMENT_CHECK, BASE_DISBURSEMENT_LOAN, BASE_DISBURSEMENT_ACH
+5.029 - Added CommunityName to MortgageLoans
+5.027 - Added S Corporation and C Corporation to Business Entity Types
+5.026 - Added bookiing officer element
+5.025 - Change approval_date and declined_date type to dateTime
+5.024 - added role_type
+5.023 - Remove the use="required" of initial_entry_timestamp
+5.022 - Added reference_number_type to BASE_SYSTEM
+5.021 - Added has_ofac_match to DeluxeInfo of Deluxe Detection
+5.020 - allow 4 digits for 903 amount per month
+5.019 - added VESTING as contact type
+5.018 - added legal_state_of_residency field
+5.017 - renamed passed_id_verification to id_verification_result
+5.016 - added more enumeration for contact types
+5.015 - added new membership fee fields and campaign code for XA
+5.014 - added "R" to EFUNDS_INFO'S passed_id_verification enumeration
+5.013 - added EFUNDS_INFO and IsOFACDebit attribute to XA Beneficiary and Special info
+5.012 - added down_payment attribute to the PERSONAL_LOAN LOAN_INFO
+5.010 - added has_property_for_sale attribute to the DECLARATIONS type
+5.009 - added paypal_paykey attribute to XA FUNDING_SOURCE
+5.008 - added BARRACKS to the enumeration for occupancy_status
+5.007 - added employment_start_date to Xpress FINANCIAL_INFO
+5.006 - added is_monthly_income_base_salary_manual
+5.005 - added is_require_confirmation
+5.004 - added military employment fields pay_grade, ets
+5.003 - added base loan contacts
+5.002 - Initial version
+5.108 - Add Organation/Club, Non Profit Corporation, Non Profit Organization
+
+-->
+<xs:schema xmlns="http://www.meridianlink.com/CLF" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.meridianlink.com/CLF" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="InternalUse.xsd" namespace="http://www.meridianlink.com/InternalUse" />
+  <xs:complexType name="BASE_APPLICANT">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID_CARD" type="BASE_ID_CARD" />
+      <xs:element minOccurs="0" name="ID_CARD2" type="BASE_ID_CARD" />
+      <xs:element minOccurs="0" name="APPROVAL_DENIAL_REASON" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Appears as denial reason on the UI.  The approval part in this node name may be misleading, but kept for backward compatibility.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="INCOME_COMMENTS" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Describes how monthly income was verified.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="APPLICANT_QUESTIONS" type="BASE_APPLICANT_QUESTIONS" />
+    </xs:sequence>
+    <xs:attribute name="borrower_id" use="optional">
+      <xs:annotation>
+        <xs:documentation>Exported by LPQ as incremental integer.   When doing import into LPQ, this value can be used as a reference from other locations, if needed (ie: see selected_product_borrower_id).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_declined" type="xs:string" />
+    <xs:attribute name="first_name" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="last_name" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="m_initial" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Use middle_name whenever possible since it will be more accurate with credit bureau and reduce problems down the road.
+
+          If both m_initial and middle_name are specified, then middle_name has precedence.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="1" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="middle_name" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="suffix">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="JR" />
+          <xs:enumeration value="SR" />
+          <xs:enumeration value="II" />
+          <xs:enumeration value="III" />
+          <xs:enumeration value="IV" />
+          <xs:enumeration value="V" />
+          <xs:enumeration value="VI" />
+          <xs:enumeration value="VII" />
+          <xs:enumeration value="VIII" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ssn" type="base_ssn" use="required" />
+    <xs:attribute name="dob" type="xs:date" />
+    <xs:attribute name="dependents">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="99" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ages_of_dependents">
+      <xs:annotation>
+        <xs:documentation>Please seperate ages by comma</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="mother_maiden_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="citizenship">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="USCITIZEN" />
+          <xs:enumeration value="PERMRESIDENT" />
+          <xs:enumeration value="NONPERMRESIDENT" />
+          <xs:enumeration value="NONRESIDENTALIEN" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="member_number">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bankruptcy_score">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="9999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="membership_months">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="9999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="marital_status">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="SEPARATED" />
+          <xs:enumeration value="UNMARRIED" />
+          <xs:enumeration value="MARRIED" />
+          <xs:enumeration value="DOMESTIC_PARTNER" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="gender">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="MALE" />
+          <xs:enumeration value="FEMALE" />
+          <xs:enumeration value="OTHER" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ethnicity">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="HISPANIC" />
+          <xs:enumeration value="NOT_HISPANIC" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="number_in_household">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="99" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="member_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="CURRENT" />
+          <xs:enumeration value="NEW" />
+          <xs:enumeration value="PRE-APPROVED" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="race">
+      <xs:simpleType>
+        <xs:restriction base="base_race_type_list" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="credit_score">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="9999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="custom_score">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="999999" />
+          <xs:minInclusive value="-999999" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="custom_score_2">
+      <xs:simpleType>
+        <xs:restriction base="xs:double">
+          <xs:minInclusive value="-999999" />
+          <xs:maxInclusive value="999999" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="declined_answer_race_gender">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="not_applicable_race_gender">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="applicant_type" type="base_applicant_type" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          P - Primary applicant.  Only usefull on export; on all other cases, primary (1st borrower) will always be the primary applicant (P).
+          C - Co Borrower (Default if not specified for additional applicants)
+          S - Cosigner
+          G - Gaurantor
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="allow_direct_mail" type="base_YN" />
+    <xs:attribute name="allow_email_solicit" type="base_YN" />
+    <xs:attribute name="allow_telemarket" type="base_YN" />
+    <xs:attribute name="allow_share_info" type="base_YN" />
+    <xs:attribute name="security_code" type="xs:string" />
+    <xs:attribute name="is_ofac_id_ver" type="base_YN" />
+    <xs:attribute name="id_authentication_result">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL" />
+          <xs:enumeration value="INCOMPLETE" />
+          <xs:enumeration value="PASS" />
+          <xs:enumeration value="REVIEW" />
+          <xs:enumeration value="NOT_REQUIRE" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_fraud_prescore" type="base_YN" />
+    <xs:attribute name="legal_state_of_residency" type="base_state" />
+    <xs:attribute name="relation_to_primary" type="xs:string" />
+    <xs:attribute name="is_fraud_fas" type="base_YN" />
+    <xs:attribute name="is_high_risk_consumer" type="base_YN" />
+    <xs:attribute name="is_thin" type="base_YN" />
+    <xs:attribute name="contact_index" type="xs:integer" />
+    <xs:attribute name="mla_covered_status" type="xs:string" />
+    <xs:attribute name="mla_covered_date" type="xs:date" />
+    <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+      <xs:annotation>
+        <xs:documentation>This field is internal_borrower_id for internal use only.  LoansPQ will export this value but will not import it.  This internal value is auto generated by LPQ when creating a new loan.  If updating a loan, use the loan_number.</xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:complexType>
+  <xs:complexType name="BASE_ADDRESS_LOOSE">
+    <xs:attribute name="street_address_1" type="xs:string" />
+    <xs:attribute name="street_address_2" type="xs:string" />
+    <xs:attribute name="country" type="xs:string" use="optional" />
+    <xs:attribute name="address_verification_date" type="xs:date" />
+    <xs:attributeGroup ref="GROUP_CITY_STATE_ZIP_COUNTY" />
+  </xs:complexType>
+  <xs:complexType name="BASE_ADDRESS_STRICT">
+    <xs:attributeGroup ref="GROUP_ADDRESS_LINE" />
+    <xs:attributeGroup ref="GROUP_CITY_STATE_ZIP_COUNTY" />
+  </xs:complexType>
+  <xs:complexType name="BASE_ADDRESS_THREE_LINE">
+    <xs:attribute name="street_address_1" type="xs:string" />
+    <xs:attribute name="street_address_2" type="xs:string" />
+    <xs:attribute name="street_address_3" type="xs:string" />
+    <xs:attribute name="country" type="xs:string" use="optional" />
+    <xs:attribute name="zip" type="base_zip" use="optional" />
+    <xs:attribute name="city" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="BASE_CURRENT_ADDRESS_CHOICE">
+    <xs:annotation>
+      <xs:documentation>
+        This is used to handle complex address scenarios for the current address.
+        NOTE:the attributes provided here replicate the LOOSE_ADDRESS datatype.  If a child node is specified, it will override these values.  When LPQ exports, it will populate both these attributes AND the LOOSE_ADDRESS subnode.
+        If foreign address, then no attributes here will be set and only THREE_LINE_ADDRESS will exist.
+        UPDATE (1/8/2008): The attributes provided here will be deprecated in the near future. Please set values in the sub nodes.  Also, please be aware there is an Xpress version in xpress_loan.xsd which support city for 3 line address.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0">
+      <xs:element name="STRICT_ADDRESS" type="BASE_ADDRESS_STRICT">
+        <xs:annotation>
+          <xs:documentation>Do NOT use this!</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="LOOSE_ADDRESS" type="BASE_ADDRESS_LOOSE">
+        <xs:annotation>
+          <xs:documentation>General format address with 2 line address.   Please note for CURRENT domestic address, the second line is NOT used.  This is due to credit integration requirements.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="THREE_LINE_ADDRESS" type="BASE_ADDRESS_THREE_LINE">
+        <xs:annotation>
+          <xs:documentation>Due to the complex nature of foreign addresses, we just provide 3 lines to enter addresses.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="BASE_INSURANCE">
+    <xs:annotation>
+      <xs:documentation>Appears once for each Credit Life,  GAP, Disability, etc.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="coverage">
+      <xs:annotation>
+        <xs:documentation>
+          S - Single
+          J - Joint
+          C - Comaker
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:NMTOKENS">
+          <xs:enumeration value="S" />
+          <xs:enumeration value="J" />
+          <xs:enumeration value="C" />
+          <xs:enumeration value="B" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="plan_key">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="description">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="premium" type="base_money" />
+    <xs:attribute name="premium_mode">
+      <xs:annotation>
+        <xs:documentation>
+          LR - Level rate
+          MR - monthly renewable
+          SP - single premium
+          DC - debt cancellation
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="MR" />
+          <xs:enumeration value="LR" />
+          <xs:enumeration value="SP" />
+          <xs:enumeration value="DC" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cost_per_day" type="base_money" />
+    <xs:attribute name="insured_amount" type="base_money" />
+    <xs:attribute name="insured_rate" type="base_rate" />
+    <xs:attribute name="expire_date" type="xs:date" />
+    <xs:attribute name="last_pulled_date" type="xs:dateTime" />
+  </xs:complexType>
+  <xs:complexType name="BASE_LOAN_INFO">
+    <xs:attribute name="rate_code" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Code associated w/ rate selected.  Max length - 20 Char.
+          This is used to link to remote system when booking.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max_underwrite_amount" type="xs:double" />
+    <xs:attribute name="payment_due_day" type="xs:integer" />
+    <xs:attribute name="payment_due_day2" type="xs:integer" />
+    <xs:attribute name="epl_fees_total">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_claimed" type="base_YN" />
+    <xs:attribute name="is_complete_consumer" type="base_YN" />
+    <xs:attribute name="require_product_refresh" type="base_YN" />
+    <xs:attribute name="is_addon" type="base_YN" />
+    <xs:attribute name="is_amendment" type="base_YN">
+      <xs:annotation>
+        <xs:documentation>Indiciates the loan is a simple amendment and reduces many validation requirements.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="rate_adjustment" type="base_rate">
+      <xs:annotation>
+        <xs:documentation>This is the amount of adjustment that was adjusted for the rate/payment percent when ran through underwriting.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="rate_adjustment_reason">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="300" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="solve_for" type="xs:string" />
+    <xs:attribute name="override_code" type="xs:string" />
+    <xs:attribute name="override_tier" type="xs:string" />
+    <xs:attribute name="is_possible_dupe" type="base_YN" />
+    <xs:attribute name="is_fraud_manual" type="base_YN" />
+    <xs:attribute name="is_ofac_manual" type="base_YN" />
+    <xs:attribute name="is_possible_dupe_manual" type="base_YN" />
+    <xs:attribute name="preapproval_type">
+      <xs:annotation>
+        <xs:documentation>
+          CS - Cross Sell
+          CP - Campaign
+          (blank) - None
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="CP" />
+          <xs:enumeration value="CS" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="app_subtype">
+      <xs:annotation>
+        <xs:documentation>
+					This field is readonly and won't be used for import.
+					IVL - Indirect Vehicle
+					DVL - Direct Vehicle
+					LVL - Lease Vehicle
+					SCC - Secured Credit Card
+					UCC - UnSecured Credit Card
+					LOCPL - Line of Credit Personal
+					SPL - Secured Personal
+					UPL - UnSecured Persona
+					IHE - Installment HomeEquity
+					LOCHE - Line of Credit HomeEquity
+					CCBL - Credit Card Business
+					IBL - Installment Business
+					LOCBL - Line of Credit Business
+					VLBL - Vehicle Business
+					(blank) - None
+				</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="IVL" />
+          <xs:enumeration value="DVL" />
+          <xs:enumeration value="LVL" />
+          <xs:enumeration value="SCC" />
+          <xs:enumeration value="UCC" />
+          <xs:enumeration value="LOCPL" />
+          <xs:enumeration value="SPL" />
+          <xs:enumeration value="UPL" />
+          <xs:enumeration value="IHE" />
+          <xs:enumeration value="LOCHE" />
+          <xs:enumeration value="CCBL" />
+          <xs:enumeration value="IBL" />
+          <xs:enumeration value="LOCBL" />
+          <xs:enumeration value="VLBL" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="campaign_code" type="xs:string" />
+    <xs:attribute name="is_workout_loan" type="base_YN" />
+    <xs:attribute name="is_solvefor_manual" type="base_YN" />
+    <xs:attribute name="tier" type="xs:integer" />
+    <xs:attribute name="tier_previous" type="xs:integer" />
+    <xs:attribute name="is_prequalification_applied" type="base_YN" />
+    <xs:attribute name="is_ofac" type="base_YN" />
+    <xs:attribute name="is_high_risk_consumer" type="base_YN" />
+    <xs:attribute name="is_high_risk_consumer_manual" type="base_YN" />
+    <xs:attribute name="product_reference_id" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="BASE_MONTHLY_DEBT">
+    <xs:attribute name="monthly_liability">
+      <xs:annotation>
+        <xs:documentation>This is the summation of all monthly payments as found on the credit report.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="monthly_housing_cost">
+      <xs:annotation>
+        <xs:documentation>5/9/05 - DEPRECATED: please use monthly_rent instead.  Housing payments are generally included in the monthly_liability from credit report.  If you need to specify a manual monthly mortgage payment, please use "monthly_mortgage_payment" attribute.    Setting that value will cause the system to try to synchronize with any mortgage tradelines matching this payment.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="monthly_rent">
+      <xs:annotation>
+        <xs:documentation>This will populate into the financial page and used in underwriting.  For non-mortgage loans, if the occupancy status is non-renting, then please do not populate this field.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="monthly_mortgage_payment">
+      <xs:annotation>
+        <xs:documentation>
+          Used to explicitly specify a monthly mortgage payment the borrower has.   If any matching tradeline is found on the credit report, that tradeline's payment will be updated with this value.
+
+          It is recommended, if at all possible, use the mortgage payments from the credit report as opposed to this to help avoid confusion.  Monthly mortgage payments will always be available on the credit report.  These monthly debt attributes are more for debts not reported on credit report.   By not keeping credit payments on the credit report and non-credit payments here, we can ensure a cleaner seperation and avoid duplicate counting and confusion.
+
+          Internal Note:  This value gets stored into the TempMonthlyHousingCost.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="job_expense">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="alimony">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="child_support">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="separate_maintenance_expense">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tax_expense">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_expense_1">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_expense_2">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_expense_description_1" type="xs:string" />
+    <xs:attribute name="other_expense_description_2" type="xs:string" />
+    <xs:attribute name="aggregate_amount_with_lender" type="base_money" />
+    <xs:attribute name="aggregate_amount_with_lender_secured_no_mortgage" type="base_money" />
+  </xs:complexType>
+  <xs:complexType name="BASE_MONTHLY_INCOME">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="20" name="OTHER_INCOME">
+        <xs:complexType>
+          <xs:attribute name="monthly_income">
+            <xs:simpleType>
+              <xs:restriction base="xs:decimal">
+                <xs:totalDigits value="19" />
+                <xs:fractionDigits value="2" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="monthly_income_description">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="200" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute default="N" name="is_tax_exempt" type="base_YN" />
+          <xs:attribute default="N" name="is_hmda_exempt" type="base_YN" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="is_monthly_income_base_salary_manual" type="base_YN" />
+    <xs:attribute name="is_bah_included" type="base_YN" />
+    <xs:attribute name="monthly_income_base_salary">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute default="N" name="is_tax_exempt_monthly_income_base_salary" type="base_YN">
+      <xs:annotation>
+        <xs:documentation>Default is N.  If Y, then the income may be grossed up before being used for underwriting.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute default="N" name="is_hmda_exempt_monthly_income_base_salary" type="base_YN">
+      <xs:annotation>
+        <xs:documentation>Default is N.  If Y, then the income won't be reported in HMDA export.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="monthly_income_over_time">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="monthly_income_bonus">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="monthly_income_commission">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="monthly_income_dividends">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="monthly_income_net_rental">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="income_verify_method">
+      <xs:annotation>
+        <xs:documentation>Indicates how income was verified.  Sample data: W2, Paystubs, bank statements</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="BASE_EMPLOYMENT">
+    <xs:attribute name="employment_start_date" type="xs:date" />
+    <xs:attribute name="employed_months">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="9999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="employment_address">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="employment_city">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="employment_state" type="base_state" />
+    <xs:attribute name="employment_zip">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="occupation">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="employer">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="employment_phone">
+      <xs:annotation>
+        <xs:documentation>
+          Employer's phone number for the FI to contact the business for verification of employment information.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="employment_status">
+      <xs:annotation>
+        <xs:documentation>
+          <item text="EMPLOYED" value="EM" />
+          <item text="ACTIVE MILITARY" value="MI" />
+          <item text="HOMEMAKER" value="HO" />
+          <item text="OWNER" value="OW" />
+          <item text="RETIRED" value="RE" />
+          <item text="SELF EMPLOYED" value="SE" />
+          <item text="STUDENT" value="ST" />
+          <item text="UNEMPLOYED" value="UN" />
+          <item text="OTHER" value="OT" />
+          <item text="RETIRED MILITARY" value="RM" />
+          <item text="GOVERNMENT/DOD" value="GOV" />
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="EM" />
+          <xs:enumeration value="MI" />
+          <xs:enumeration value="HO" />
+          <xs:enumeration value="OW" />
+          <xs:enumeration value="RE" />
+          <xs:enumeration value="SE" />
+          <xs:enumeration value="ST" />
+          <xs:enumeration value="UN" />
+          <xs:enumeration value="OT" />
+          <xs:enumeration value="RM" />
+          <xs:enumeration value="GOV" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_employment_description">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="supervisor_name" type="xs:string" />
+    <xs:attribute name="pay_grade" type="xs:string" />
+    <xs:attribute name="ets" type="xs:date" />
+    <xs:attribute name="employment_weekly_hours" type="xs:int">
+      <xs:annotation>
+        <xs:documentation>May not apply.  This field is usually not available for lenders.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="employment_business_type" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="BASE_REFERENCE">
+    <xs:attribute name="first_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="last_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="address">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="city">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="state" type="base_state" />
+    <xs:attribute name="zip">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="phone">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="relationship">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="email">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="BASE_CONTACT_INFO">
+    <xs:attribute name="preferred_contact_method">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="HOME" />
+          <xs:enumeration value="WORK" />
+          <xs:enumeration value="CELL" />
+          <xs:enumeration value="EMAIL" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cell_phone" type="xs:string" />
+    <xs:attribute default="US" name="cell_phone_country" type="base_phone_country_alpha2" />
+    <xs:attribute name="fax_number" type="xs:string" />
+    <xs:attribute default="US" name="fax_number_country" type="base_phone_country_alpha2" />
+    <xs:attribute name="email">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="home_phone" type="xs:string" />
+    <xs:attribute default="US" name="home_phone_country" type="base_phone_country_alpha2" />
+    <xs:attribute name="work_phone" type="xs:string" />
+    <xs:attribute default="US" name="work_phone_country" type="base_phone_country_alpha2" />
+    <xs:attribute name="work_phone_extension">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="BASE_COMMENTS">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="DECISION_COMMENTS" />
+      <!--Following elements are obsolete, see their replacement on BASE_APPLICANT-->
+      <!--<xs:element name="CO_APPROVAL_DENIAL_REASONS" minOccurs="0"/>-->
+      <!--<xs:element name="APPROVAL_DENIAL_REASONS" minOccurs="0">
+
+				<xs:annotation>
+
+					<xs:documentation>Appears as denial reason on the UI.  The approval part in this node name may be misleading, but kept for backward compatibility.</xs:documentation>
+
+				</xs:annotation>
+
+			</xs:element>-->
+      <xs:element minOccurs="0" name="EXTERNAL_COMMENTS">
+        <xs:annotation>
+          <xs:documentation>also known as Consumer Comments on Comments page</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="INTERNAL_COMMENTS" />
+      <xs:element minOccurs="0" name="STIPULATIONS" />
+      <xs:element minOccurs="0" name="FRAUD_WARNINGS" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BASE_TASK_LIST">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TASK">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" name="ASSIGNTO" type="BASE_PARTY" />
+            <xs:element minOccurs="0" name="COMPLETE" type="BASE_PARTY" />
+            <xs:element minOccurs="0" name="CREATE" type="BASE_PARTY" />
+            <xs:element minOccurs="0" name="DUELOAN" type="BASE_PARTY" />
+            <xs:element minOccurs="0" name="APPLIEDSET">
+              <xs:complexType mixed="true">
+                <xs:attribute name="conditionset_hash" />
+                <xs:attribute name="encoding" />
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="REQUIRESET">
+              <xs:complexType mixed="true">
+                <xs:attribute name="conditionset_hash" />
+                <xs:attribute name="encoding" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="date_due" />
+          <xs:attribute name="date_completed" />
+          <xs:attribute name="date_created" />
+          <xs:attribute name="description" />
+          <xs:attribute name="required" />
+          <xs:attribute name="completed" />
+          <xs:attribute name="category" />
+          <xs:attribute name="priority" />
+          <xs:attribute name="position" />
+          <xs:attribute name="assignto_officer" />
+          <xs:attribute name="complete_officer" />
+          <xs:attribute name="create_officer" />
+          <xs:attribute name="dueloan_officer" />
+          <xs:attribute name="is_applied" />
+          <xs:attribute name="is_required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BASE_FUNDING_INFO">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="SKIP_PAYMENT_INFO" type="SKIP_PAYMENT_INFO" />
+      <xs:element minOccurs="0" name="PAYMENT_INFO" type="BASE_PAYMENT_INFO_CHOICE" />
+    </xs:sequence>
+    <xs:attribute name="daily_periodic_rate">
+      <xs:simpleType>
+        <xs:restriction base="base_rate" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="payment_frequency">
+      <xs:annotation>
+        <xs:documentation>
+          Number to the right represenets # of payments / year.
+
+          Annually = 1
+          SemiAnnually = 2 'twice a year
+          Quarterly = 4
+          BiMonthly = 6 'every 2 months
+          Monthly = 12
+          QuadWeekly = 13 'every 4 week
+          SemiMonthly = 24 'twice a month
+          BiWeekly = 26 'ever 2 week
+          Weekly = 52
+          SinglePayment = 0  'payment may be due in x years from now.
+          TwiceMonthly = 25 'Every 14 days with one exception. Only two payments will be due in any calendar month. In those months in which three payments might be due, the system will not require a payment on the third payment due date of the month. Upon processing the second loan payment in a given month, the system will advance the next payment due date by 28 days (4 calendar weeks) rather than the normal 14 days (2 calendar weeks). This frequency is desirable for those members who receive payroll deductions every 14 days, except when there are three pay periods in a given month and no deductions are made for the third pay period.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:NMTOKEN">
+          <xs:enumeration value="ANNUALLY" />
+          <xs:enumeration value="SEMI-ANNUALLY" />
+          <xs:enumeration value="QUARTERLY" />
+          <xs:enumeration value="BI-MONTHLY" />
+          <xs:enumeration value="MONTHLY" />
+          <xs:enumeration value="QUAD-WEEKLY" />
+          <xs:enumeration value="SEMI-MONTHLY" />
+          <xs:enumeration value="BI-WEEKLY" />
+          <xs:enumeration value="WEEKLY" />
+          <xs:enumeration value="SINGLE-PAYMENT" />
+          <xs:enumeration value="TWICE-MONTHLY" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="funded_status">
+      <xs:annotation>
+        <xs:documentation>
+          Specified funding status for regular loans:
+          FUN - Funded
+          PROC - PROCESSING
+          UF - UNABLE TO FUND
+          RF - READY FOR FUNDING
+          RD - READY FOR DOCS
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FUN" />
+          <xs:enumeration value="UF" />
+          <xs:enumeration value="RF" />
+          <xs:enumeration value="PROC" />
+          <xs:enumeration value="RD" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="loan_date" type="xs:date" />
+    <xs:attribute name="funding_date" type="xs:date" />
+  </xs:complexType>
+  <xs:complexType name="BASE_ASSET">
+    <xs:attribute name="asset_type" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          If the type of asset is a vehicle, real estate, etc. please make sure the asset_type value being used makes sense (ie: VEHICLE asset elements should have asset_type='AUTOMOBILE')
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:NMTOKEN">
+          <xs:enumeration value="CERTIFICATE" />
+          <xs:enumeration value="CASH_DEPOSIT" />
+          <xs:enumeration value="SHARE_BACK" />
+          <xs:enumeration value="STOCK" />
+          <xs:enumeration value="BOND" />
+          <xs:enumeration value="CHECKING_ACCOUNT" />
+          <xs:enumeration value="SAVINGS_ACCOUNT" />
+          <xs:enumeration value="REALESTATE" />
+          <xs:enumeration value="MACHINERY_AND_EQUIPMENT" />
+          <xs:enumeration value="FURNITURE_AND_FIXTURES" />
+          <xs:enumeration value="AUTOMOBILE" />
+          <xs:enumeration value="LIFE_INSURANCE" />
+          <xs:enumeration value="RETIREMENT_FUND" />
+          <xs:enumeration value="OWNED_BUSINESS" />
+          <xs:enumeration value="OTHER" />
+          <xs:enumeration value="OTHER_NON_LIQUID" />
+          <xs:enumeration value="BRIDGE_LOAN_NOT_DEPOSITED" />
+          <xs:enumeration value="CASH_ON_HAND" />
+          <xs:enumeration value="GIFT" />
+          <xs:enumeration value="MONEY_MARKET" />
+          <xs:enumeration value="MUTUAL_FUNDS" />
+          <xs:enumeration value="SECURED_BORROWER_FUNDS" />
+          <xs:enumeration value="TRUST_FUNDS" />
+          <xs:enumeration value="IRA" />
+          <xs:enumeration value="NET_SALE_PROCEEDS" />
+          <xs:enumeration value="GIFT_OF_EQUITY" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="asset_value">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_address">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_zip" type="base_zip" />
+    <xs:attribute name="property_state" type="base_state" />
+    <xs:attribute name="property_city">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="existing_loan_amount">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="description">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="account_number">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bank_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_collateral">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ownership_type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="B" />
+          <xs:enumeration value="J" />
+          <xs:enumeration value="T" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_owner_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_owner_name2">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="available_account_info">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="stock_bond_mutualfund_share_count" type="xs:integer" />
+    <xs:attribute name="verification_status">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="N/A" />
+          <xs:enumeration value="UNVERIFIED" />
+          <xs:enumeration value="VERIFIED" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_owner_contact_index" type="xs:integer" />
+    <xs:attribute name="other_owner_contact_index2" type="xs:integer" />
+  </xs:complexType>
+  <xs:complexType name="BASE_ASSET_VEHICLE">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_ASSET">
+        <xs:attribute name="vehicle_year">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="vehicle_make">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="vehicle_model">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="vehicle_vin" type="xs:string" />
+        <xs:attribute name="vehicle_title_owner" type="xs:string" />
+        <xs:attribute name="vehicle_title_number" type="xs:string" />
+        <xs:attribute name="vehicle_color" type="xs:string" />
+        <xs:attribute name="vehicle_miles" type="xs:int" />
+        <xs:attribute name="vehicle_license_plate" type="xs:string" />
+        <xs:attribute name="vehicle_seller" type="xs:string" />
+        <xs:attribute name="vehicle_has_proof_insurance" type="base_YN" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_ASSET_REAL_ESTATE">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_ASSET">
+        <xs:attribute name="property_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="SFR" />
+              <xs:enumeration value="2 UNIT" />
+              <xs:enumeration value="3 UNIT" />
+              <xs:enumeration value="4 UNIT" />
+              <xs:enumeration value="5+ UNIT" />
+              <xs:enumeration value="TOWNHOUSE" />
+              <xs:enumeration value="HIGH RISE CONDO" />
+              <xs:enumeration value="LOW RISE CONDO" />
+              <xs:enumeration value="PUD" />
+              <xs:enumeration value="MOBILE HOME" />
+              <xs:enumeration value="MANUFACTURED HOME" />
+              <xs:enumeration value="MIXED USE" />
+              <xs:enumeration value="CONDOTEL" />
+              <xs:enumeration value="COOP" />
+              <xs:enumeration value="COMMERCIAL" />
+              <xs:enumeration value="FARM" />
+              <xs:enumeration value="HOME BUSINESS" />
+              <xs:enumeration value="LAND" />
+              <xs:enumeration value="OTHER" />
+              <xs:enumeration value="MNL" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="property_gross_rental_income">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="property_net_rental_income">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="property_mortgage_payments">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="property_other_costs">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="property_current_residence_indicator" type="base_YN" />
+        <xs:attribute name="property_disposition">
+          <xs:annotation>
+            <xs:documentation>
+              <item text="SOLD" value="S" />
+              <item text="RETAINED" value="H" />
+              <item text="PENDING SALE" value="P" />
+              <item text="RENTAL" value="R" />
+            </xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="S" />
+              <xs:enumeration value="H" />
+              <xs:enumeration value="P" />
+              <xs:enumeration value="R" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="is_subject_property" type="base_YN">
+          <xs:annotation>
+            <xs:documentation>Only applicable if this is a mortgage loan.  Y indicates this asset is same as the property being financed.  N otherwise.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="property_tax_id" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>this is also known as parcel #</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="is_financed_property" type="base_YN">
+          <xs:annotation>
+            <xs:documentation>Only applicable if this is a mortgage loan to count multiple financed properties in FNMA.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_ASSET_CERTIFICATE">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_ASSET">
+        <xs:attribute name="certificate_number">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="expiration_date" type="xs:date" />
+        <xs:attribute name="issue_date" type="xs:date" />
+        <xs:attribute name="pledge_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="rate" type="base_rate">
+          <xs:annotation>
+            <xs:documentation>Rate of any existing loan on this asset.  This could be the interest rate on a CD account</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pledge_percent" type="base_rate">
+          <xs:annotation>
+            <xs:documentation>This field has been depracated in favor of pledge_value_type + pledge_value</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pledge_value_type" type="xs:string" />
+        <xs:attribute name="pledge_value" type="pledge_rate" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_ASSET_SAVINGS_ACCOUNT">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_ASSET">
+        <xs:attribute name="expiration_date" type="xs:date" />
+        <xs:attribute name="issue_date" type="xs:date" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_ASSET_SHARE">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_ASSET">
+        <xs:attribute name="expiration_date" type="xs:date" />
+        <xs:attribute name="pledge_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="rate">
+          <xs:annotation>
+            <xs:documentation>Rate of any existing loan on this asset.  This could be the interest rate on a CD account</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="base_rate" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="pledge_percent" type="base_rate">
+          <xs:annotation>
+            <xs:documentation>This field has been depracated in favor of pledge_value_type + pledge_value</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pledge_value_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="PERCENT" />
+              <xs:enumeration value="PERCENTLOAN" />
+              <xs:enumeration value="AMOUNT" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="pledge_value" type="pledge_rate" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_ASSET_LIST">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="REAL_ESTATE" type="BASE_ASSET_REAL_ESTATE" />
+      <xs:element name="ASSET">
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_ASSET" />
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VEHICLE" type="BASE_ASSET_VEHICLE" />
+      <xs:element name="SHARES" type="BASE_ASSET_SHARE" />
+      <xs:element name="CERTIFICATE" type="BASE_ASSET_CERTIFICATE" />
+      <xs:element name="SAVINGS_ACCOUNT" type="BASE_ASSET_SAVINGS_ACCOUNT" />
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="BASE_DISBURSEMENT">
+    <xs:attribute name="amount">
+      <xs:annotation>
+        <xs:documentation>
+		  For LoansPQ 2.0 applications, if disbursement fee is linked with application field, 
+		  this amount field will be readonly in CLF and mapped the corresponding application field.
+		</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="reference_id" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="BASE_DISBURSEMENT_CHECK">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_DISBURSEMENT">
+        <xs:attribute name="check_number" type="xs:string" />
+        <xs:attribute name="check_payable_to">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_address_1">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_address_2">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_address_3">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_zip">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_remitter">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_purpose">
+          <xs:annotation>
+            <xs:documentation>
+              Purpose of disbursing the check.
+              CLSAC - Close Account
+              PAYBL - Pay Toward Balance
+              VLD - American Airlines Customization
+              VLPRD - American Airlines Customization
+              VLABD - American Airlines Customization
+              "" - This is generally for case of refinancing.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="CLSAC" />
+              <xs:enumeration value="PAYBL" />
+              <xs:enumeration value="VLD" />
+              <xs:enumeration value="VLPRD" />
+              <xs:enumeration value="VLABD" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_status">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="NOT_PRINTED" />
+              <xs:enumeration value="PRINTED" />
+              <xs:enumeration value="VOIDED" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_print_option">
+          <xs:annotation>
+            <xs:documentation>This attribute used by EPL only.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:int">
+              <xs:minInclusive value="0" />
+              <xs:maxInclusive value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_is_payee_only" type="base_YN" />
+        <xs:attribute name="check_is_primary_applicant" type="base_YN" />
+        <xs:attribute name="payoff_date">
+          <xs:annotation>
+            <xs:documentation>This attribute used by University of Wisconsin Credit Union only.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:date" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="interest_per_diem">
+          <xs:annotation>
+            <xs:documentation>This attribute used by University of Wisconsin Credit Union only.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:double" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="check_remitter_contact_index" type="xs:integer" />
+        <xs:attribute name="check_remitter_contact_index2" type="xs:integer" />
+        <xs:attribute name="check_coremitter_contact_index" type="xs:integer" />
+        <xs:attribute name="is_payee_ofac_istwatch" type="base_YN" />
+        <xs:attribute name="istwatch_transaction_date" type="xs:string" />
+        <xs:attribute name="check_account_number" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_DISBURSEMENT_DEPOSIT">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_DISBURSEMENT">
+        <xs:attribute name="deposit_account">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="deposit_suffix">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="deposit_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="deposit_date_to_credit" type="xs:date" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_DISBURSEMENT_FEE">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_DISBURSEMENT">
+        <xs:attribute name="prepaid_fees_financed">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="fees_financed">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="fees_gl_account_number">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="fee_description">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="fee_linking_type">
+          <xs:annotation>
+            <xs:documentation>
+				Used for LoansPQ 2.0 applications only
+				If value set, disbursment fee item will be linked with corresponding application field.
+				Amount field will be readonly in CLF and will be the same as application field.
+				Additional Fee 1: ATO1
+				Additional Fee 2: ATO2
+				Additional Fee 3: ATO3
+				Additional Fee 4: ATO4
+				Additional Fee 5: ATO5
+				Additional Fee 6: ATO6
+				Additional Fee 7: ATO7
+				Additional Fee 8: ATO8
+				Additional Fee 9: ATO9
+				Additional Fee 10: ATO10
+				Doc Stamp Fee: DSF
+				Filing Fee: FF
+			</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="ATO1" />
+              <xs:enumeration value="ATO2" />
+              <xs:enumeration value="ATO3" />
+              <xs:enumeration value="ATO4" />
+              <xs:enumeration value="ATO5" />
+              <xs:enumeration value="ATO6" />
+              <xs:enumeration value="ATO7" />
+              <xs:enumeration value="ATO8" />
+              <xs:enumeration value="ATO9" />
+              <xs:enumeration value="ATO10" />
+              <xs:enumeration value="DSF" />
+              <xs:enumeration value="FF" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_DISBURSEMENT_LOAN">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_DISBURSEMENT">
+        <xs:attribute name="loan_suffix">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="loan_is_repay_loan">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="loan_description">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="loan_is_same_account">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="" />
+              <xs:enumeration value="Y" />
+              <xs:enumeration value="N" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="payoff_date">
+          <xs:annotation>
+            <xs:documentation>This attribute used by University of Wisconsin Credit Union only.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:date" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="interest_per_diem">
+          <xs:annotation>
+            <xs:documentation>This attribute used by University of Wisconsin Credit Union only.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:double" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="loan_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="payment_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="loan_account_number" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_DISBURSEMENT_ACH">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_DISBURSEMENT">
+        <xs:attribute name="name_on_account">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="account_number">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="bank_routing_number">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="bank_name">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="bank_state" type="base_state" />
+        <xs:attribute name="account_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="CHECKING" />
+              <xs:enumeration value="SAVINGS" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="transaction_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="NORMAL" />
+              <xs:enumeration value="DEALER_RESERVE" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="ach_is_primary_applicant" type="base_YN" />
+        <xs:attribute name="payoff_date">
+          <xs:annotation>
+            <xs:documentation>This attribute used by University of Wisconsin Credit Union only.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:date" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="interest_per_diem">
+          <xs:annotation>
+            <xs:documentation>This attribute used by University of Wisconsin Credit Union only.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:double" />
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_DISBURSEMENT_LIST">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="CHECK" type="BASE_DISBURSEMENT_CHECK" />
+      <xs:element name="DEPOSIT" type="BASE_DISBURSEMENT_DEPOSIT" />
+      <xs:element name="FEE" type="BASE_DISBURSEMENT_FEE" />
+      <xs:element name="LOAN" type="BASE_DISBURSEMENT_LOAN" />
+      <xs:element name="ACH" type="BASE_DISBURSEMENT_ACH" />
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="BASE_SYSTEM">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="PROCESSOR" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="LOAN_OFFICER" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="BOOKING_OFFICER" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="APPROVAL_OFFICER" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="COUNTER_OFFER_OFFICER" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="FUNDER" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="DECLINING_OFFICER" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="DECIDING_OFFICER" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="ORIGINATOR">
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_PARTY">
+              <xs:attribute name="type" use="required">
+                <xs:annotation>
+                  <xs:documentation>
+                    List of supported originator types.
+                    <item text="Consumer" value="C" />
+                    <item text="Lender" value="L" />
+                    <item text="Clinic" value="P" />
+                    <item text="Operator" value="O" />
+                    <item text="Prospects" value="S" />
+                    <item text="System" value="Z" />
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="C" />
+                    <xs:enumeration value="L" />
+                    <xs:enumeration value="P" />
+                    <xs:enumeration value="O" />
+                    <xs:enumeration value="S" />
+                    <xs:enumeration value="Z" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="BRANCH" type="BASE_BRANCH" />
+      <xs:element minOccurs="0" name="LENDER">
+        <xs:annotation>
+          <xs:documentation>If type=LPQ, it is highly recommended to specify the id of the lender here to avoid potential data loss/side effects in case a lender id is forced into the app by the system.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_PARTY">
+              <xs:sequence minOccurs="0">
+                <xs:element minOccurs="0" name="ADDRESS" type="BASE_ADDRESS_LOOSE" />
+              </xs:sequence>
+              <xs:attribute name="cuna_client_id">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ORGANIZATION" type="BASE_PARTY" />
+      <xs:element minOccurs="0" name="INSURANCE_SELLER" type="BASE_PARTY">
+        <xs:annotation>
+          <xs:documentation>information about the loan officer that sold insurance for the loan, if any.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="CLINIC" type="BASE_PARTY">
+        <xs:annotation>
+          <xs:documentation>If originated from Clinic, then this should be filled out.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="CLINIC_WORKER" type="BASE_PARTY">
+        <xs:annotation>
+          <xs:documentation>Employee of clinic that worked on the loan.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="INSURANCE_LAST_PULLED_OFFICER" type="BASE_PARTY">
+        <xs:annotation>
+          <xs:documentation>information about the loan officer that sold insurance for the loan, if any.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute default="GATEWAY" name="source" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute default="" name="origination_ip" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="external_source" use="optional">
+      <xs:annotation>
+        <xs:documentation>Freeform text (max 20 for LPQ system) that describes where app orginate from.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="loan_number" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>This is a string to accomodate other system using non-numeric loan numbers.  However, on LPQ system, all loan #'s are integers.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reference_number_type" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>This is a string indicates the type of reference number.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+      <xs:annotation>
+        <xs:documentation>This field is loan_id for internal use only.  LoansPQ will export this value but will not import it.  This internal value is auto generated by LPQ when creating a new loan.  If updating a loan, use the loan_number.</xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:complexType>
+  <xs:complexType name="BASE_PARTY">
+    <xs:attribute name="reference_id" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Idientifier of entity in remote/reference system.
+          When SYSTEM/@type=LPQ, LPQ will attempt to use this to lookup and set entity based on ReferenceID in LPQ setup.
+          LPQ INTERNAL NOTES:  If this is specified, then "id" should be blank string -- otherwise "id" will take precedence on import logic.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string" />
+    <xs:attribute name="code" type="xs:string" />
+    <xs:attribute name="phone" type="xs:string" />
+    <xs:attribute name="fax" type="xs:string" />
+    <xs:attribute name="email" type="xs:string" />
+    <xs:attribute name="title" type="xs:string" />
+    <xs:attribute name="teller_number" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Applicable only for physical person entities (ie: PROCESSOR, LOAN_OFFICER).  </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="terminal_id" type="xs:string" />
+    <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+      <xs:annotation>
+        <xs:documentation>Identifier relative to the system type importing into.   if using the internal_id to set the entity, please pass an empty value to the id</xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:complexType>
+  <xs:complexType name="BASE_BRANCH">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_PARTY">
+        <xs:sequence minOccurs="0">
+          <xs:element minOccurs="0" name="ADDRESS" type="BASE_ADDRESS_LOOSE" />
+        </xs:sequence>
+        <xs:attribute name="reference_id2" />
+        <xs:attribute name="deluxe_org_reporting_unit" />
+        <xs:attribute name="ews_org_reporting_unit" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_LOAN_STATUS">
+    <xs:attribute name="loan_status" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          PRE-APPROVED : PRE-APP
+          PENDING : PEN
+          APPROVED : APP
+          INSTANT APPROVED : AA
+          APPROVED PENDING : AP
+          COUNTER-OFFER : OFF
+          DECLINED : DEC
+          INSTANT DECLINED : AD
+          DUPLICATE : DUP
+          INCOMPLETE : INC
+          MEMBER WAITING : MEMWAIT
+          MEMBER DECLINED CREDIT : MEMDC
+          MEMBERSHIP DENIED : DEN
+          CANCELED : CAN
+          INQUIRING : INQ
+          NEED MORE INFO : NMI
+          CO-APP DECLINED : CODEC
+          APPROVED PENDING 2ND SIG : AP2S
+          REFERRED : REF
+          APPROVED/MEMBER DECLINED : AMD
+          WITHDRAWN : WTHDRN or WTHDRNO
+          REVIEW : REVIEW
+          FRAUD : FRAUD
+          CLOSED FOR INCOMPLETENESS : CFI or CFIO
+          PREAPPROVAL REQUEST DENIED : PRD
+          PREAPPROVAL REQUEST APPROVED : PRA
+          It is the responsibility of the client to only set the status to a status that is active in the system
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:NMTOKEN">
+          <xs:enumeration value="PRE-APP" />
+          <xs:enumeration value="PEN" />
+          <xs:enumeration value="APP" />
+          <xs:enumeration value="AA" />
+          <xs:enumeration value="AD" />
+          <xs:enumeration value="AP" />
+          <xs:enumeration value="OFF" />
+          <xs:enumeration value="DEC" />
+          <xs:enumeration value="DUP" />
+          <xs:enumeration value="INC" />
+          <xs:enumeration value="DEN" />
+          <xs:enumeration value="CAN" />
+          <xs:enumeration value="INQ" />
+          <xs:enumeration value="NMI" />
+          <xs:enumeration value="CODEC" />
+          <xs:enumeration value="AP2S" />
+          <xs:enumeration value="MEMWAIT" />
+          <xs:enumeration value="WTHDRN" />
+          <xs:enumeration value="WTHDRNO" />
+          <xs:enumeration value="REF" />
+          <xs:enumeration value="AMD" />
+          <xs:enumeration value="MEMDC" />
+          <xs:enumeration value="REVIEW" />
+          <xs:enumeration value="FRAUD" />
+          <xs:enumeration value="CFI" />
+          <xs:enumeration value="CFIO" />
+          <xs:enumeration value="PRD" />
+          <xs:enumeration value="PRA" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="initial_entry_timestamp">
+      <xs:annotation>
+        <xs:documentation>
+          The initial entry timestamp is set to the date and time that the application is created.
+          It is used to determined when the loan application started and cannot be changed.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:dateTime" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="last_modified">
+      <xs:annotation>
+        <xs:documentation>
+          The date the application was last modified.  This value can be sent, but will not be stored to database.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:dateTime" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="submit_date">
+      <xs:simpleType>
+        <xs:restriction base="xs:dateTime" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="underwrite_submit_date">
+      <xs:annotation>
+        <xs:documentation>Date when processor clicked Submit to UW to send app to underwriter.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:dateTime" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_locked" use="required">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="existing_balance">
+      <xs:annotation>
+        <xs:documentation>Current balance of loan as of existing_balance_date</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="existing_balance_date" type="xs:date" />
+    <xs:attribute name="delinquency_period" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          30, 60, 90, 120 days delinq
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="delinquency_amount">
+      <xs:annotation>
+        <xs:documentation>Current balance of loan as of existing_balance_date</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="approval_date" type="xs:dateTime" />
+    <xs:attribute name="declined_date" type="xs:dateTime" />
+    <xs:attribute name="first_approval_date" type="xs:dateTime" />
+    <xs:attribute name="next_payment_date" type="xs:date" />
+    <xs:attribute name="response_date" type="xs:dateTime" />
+    <xs:attribute name="counter_offer_date" type="xs:dateTime" />
+    <xs:attribute name="app_receive_date" type="xs:dateTime" />
+    <xs:attribute name="deciding_date" type="xs:date" />
+    <xs:attribute name="booking_date" type="xs:dateTime" />
+    <xs:attribute name="booking_reference_id" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="BASE_PRICE_ADJUSTMENT_LIST">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="99" name="PRICE_ADJUSTMENT">
+        <xs:complexType>
+          <xs:attribute name="adjust_type" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="RATE" />
+                <xs:enumeration value="APR" />
+                <xs:enumeration value="PMT_P" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="value" type="xs:double" />
+          <xs:attribute name="description" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BASE_CLOSE_END_INFO">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="10" name="ATO">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" />
+          <xs:attribute name="memo" type="xs:string" />
+          <xs:attribute name="amount" type="base_money" />
+          <xs:attribute name="is_PPFC" type="base_YN">
+            <xs:annotation>
+              <xs:documentation>
+					For LoansPQ 2.0 apps, only used when funding_method is IL
+				</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="is_mapr" type="base_YN">
+            <xs:annotation>
+              <xs:documentation>
+					For LoansPQ 2.0 apps, only used when funding_method is IL
+				</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute default="IL" name="funding_method" use="optional">
+            <xs:annotation>
+              <xs:documentation>
+					Used for LoansPQ 2.0 applications only
+					Include in loan: IL
+					Short fund dealer reserve: SD
+					Short fund the loan: SL
+					Exclude from loan: EL
+				</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="IL" />
+                <xs:enumeration value="SD" />
+                <xs:enumeration value="SL" />
+                <xs:enumeration value="EL" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="amount_owed_to_lender" type="base_money">
+      <xs:annotation>
+        <xs:documentation>Readonly property.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="amount_refinanced" type="base_money" />
+    <xs:attribute name="cash_prepaid_finance_charge" type="base_money" />
+    <xs:attribute name="mapr_cash_fee" type="base_money" />
+    <xs:attribute name="filing_fee_amount" type="base_money">
+      <xs:annotation>
+        <xs:documentation>depracated, please use Vehicle/Personal_Funding elements</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="filing_fee_type">
+      <xs:annotation>
+        <xs:documentation>depracated, please use Vehicle/Personal_Funding elements</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FINANCED" />
+          <xs:enumeration value="CASH" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="BASE_CUSTOM_QUESTIONS">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CUSTOM_QUESTION">
+        <xs:annotation>
+          <xs:documentation>Note, when importing, it is vitally important you have question_name correctly setup. If a question cannot be found in LPQ db, then it will be ignored.  This also means you must setup the correct lender id on the SYSTEM nodes.  If LPQ cannot find the right lender for this loan or it is empty, then custom questions will not be imported.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="CUSTOM_QUESTION_ANSWER">
+              <xs:complexType>
+                <xs:attribute name="answer_text" type="xs:string" />
+                <xs:attribute name="answer_value" type="xs:string" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="question_name" type="xs:string" />
+          <xs:attribute name="question_type" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BASE_APPLICANT_QUESTIONS">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="APPLICANT_QUESTION">
+        <xs:annotation>
+          <xs:documentation>Note, when importing, it is vitally important you have question_name correctly setup. If a question cannot be found in LPQ db, then it will be ignored.  This also means you must setup the correct lender id on the SYSTEM nodes.  If LPQ cannot find the right lender for this loan or it is empty, then custom questions will not be imported.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="APPLICANT_QUESTION_ANSWER">
+              <xs:complexType>
+                <xs:attribute name="answer_text" type="xs:string" />
+                <xs:attribute name="answer_value" type="xs:string" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="question_name" type="xs:string" />
+          <xs:attribute name="question_type" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BASE_PAYMENT_INFO_CHOICE">
+    <xs:choice minOccurs="0">
+      <xs:element name="COUPON_BOOK" type="PAYMENT_COUPON_BOOK_INFO" />
+      <xs:element name="PAYROLL_DEDUCTION" type="PAYMENT_PAYROLL_DEDUCTION_INFO" />
+      <xs:element name="MANUAL_NO_COUPON" type="PAYMENT_MANUAL_NO_COUPON_INFO" />
+      <xs:element name="TRANSFER_FROM_INTERNAL_ACCOUNT" type="PAYMENT_TRANSFER_FROM_INTERNAL_ACCOUNT_INFO" />
+      <xs:element name="TRANSFER_FROM_OTHER_INSTITUTION" type="PAYMENT_TRANSFER_FROM_OTHER_INSTITUTION_INFO" />
+    </xs:choice>
+  </xs:complexType>
+  <xs:attributeGroup name="GROUP_CUNA_FIELDS">
+    <xs:attribute name="initial_amount_advanced">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="last_payment_date" type="xs:date" />
+    <xs:attribute name="finance_charge">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="total_financed_payment">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_charges">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_charges_description" type="xs:string" />
+    <xs:attribute name="amount_advanced">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="prev_loan_liner_balance">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="prev_payment_date" type="xs:date" />
+    <xs:attribute name="other_loans">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="current_payment">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="current_payment_due_date" type="xs:date" />
+    <xs:attribute name="filing_fee_amount" type="base_money" />
+    <xs:attribute name="filing_fee_type">
+	  <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FINANCED" />
+          <xs:enumeration value="CASH" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="interest_only_min_payment">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="interest_only_max_payment">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="GROUP_DOC_STAMPS_FIELDS">
+    <xs:attribute name="doc_stamps_fee" type="xs:double" />
+    <xs:attribute name="doc_stamps_rate" type="xs:double" />
+    <xs:attribute name="doc_stamps_fee_is_manual" type="base_YN" />
+    <xs:attribute name="doc_stamps_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FINANCED" />
+          <xs:enumeration value="CASH" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="GROUP_CITY_STATE_ZIP_COUNTY">
+    <xs:attribute name="city">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="state" type="base_state" />
+    <xs:attribute name="zip">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="county">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="GROUP_ADDRESS_LINE">
+    <xs:attribute name="street_address">
+      <xs:annotation>
+        <xs:documentation>
+          (1/8/2008): Please do not use these fields: street_no, street_name, street_direction, street_type, unit_no. Those attributes will be deprecated in the near future.  Please use LOOSE_ADDRESS with street_addrses_1 instead.
+          (1/29/2012): This group is only used by STRICT_ADDRESS (legacy element).
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="street_no">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="street_direction">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="EAST" />
+          <xs:enumeration value="NORTH" />
+          <xs:enumeration value="NORTHEAST" />
+          <xs:enumeration value="SOUTH" />
+          <xs:enumeration value="SOUTHEAST" />
+          <xs:enumeration value="WEST" />
+          <xs:enumeration value="NORTHWEST" />
+          <xs:enumeration value="SOUTHWEST" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="street_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="street_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="unit_no">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="verification_date">
+      <xs:simpleType>
+        <xs:restriction base="xs:date" />
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="GROUP_OCCUPANCY_STATUS_DURATION">
+    <xs:annotation>
+      <xs:documentation>specifies how long has a person stayed at an address and how did they occupy it</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="occupancy_status">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="LIVEWITHPARENTS" />
+          <xs:enumeration value="OWN" />
+          <xs:enumeration value="RENT" />
+          <xs:enumeration value="BUYING" />
+          <xs:enumeration value="OTHER" />
+          <xs:enumeration value="GOVQUARTERS" />
+          <xs:enumeration value="BARRACKS" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="occupancy_duration">
+      <xs:annotation>
+        <xs:documentation>Specified the number of MONTHS the person has stayed at given location.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_occupancy_description">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="GROUP_INDEX_MARGIN_FLOOR_CEILING">
+    <xs:attribute name="index" type="base_rate" />
+    <xs:attribute name="margin" type="base_rate" />
+    <xs:attribute name="floor" type="base_rate" />
+    <xs:attribute name="ceiling" type="base_rate" />
+  </xs:attributeGroup>
+  <xs:simpleType name="base_ssn">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{9}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_state">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0" />
+      <xs:maxLength value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="pledge_rate">
+    <xs:annotation>
+      <xs:documentation>This is for pledge value since it can be a dollar amount or percentage</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:totalDigits value="10" />
+      <xs:fractionDigits value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_rate">
+    <xs:restriction base="xs:decimal">
+      <xs:totalDigits value="8" />
+      <xs:fractionDigits value="5" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_YN">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Y" />
+      <xs:enumeration value="N" />
+      <xs:enumeration value="" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_phone_country_alpha2">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="">
+        <xs:annotation>
+          <xs:documentation>Unknown. </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AX">
+        <xs:annotation>
+          <xs:documentation>AALAND (+358)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AF">
+        <xs:annotation>
+          <xs:documentation>AFGHANISTAN (+93)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AL">
+        <xs:annotation>
+          <xs:documentation>ALBANIA (+355)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DZ">
+        <xs:annotation>
+          <xs:documentation>ALGERIA (+213)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AS">
+        <xs:annotation>
+          <xs:documentation>AMERICAN SAMOA (+1684)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AD">
+        <xs:annotation>
+          <xs:documentation>ANDORRA (+376)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AO">
+        <xs:annotation>
+          <xs:documentation>ANGOLA (+244)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AI">
+        <xs:annotation>
+          <xs:documentation>ANGUILLA (+1264)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AQ">
+        <xs:annotation>
+          <xs:documentation>ANTARCTICA (+64)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AG">
+        <xs:annotation>
+          <xs:documentation>ANTIGUA AND BARBUDA (+1268)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AR">
+        <xs:annotation>
+          <xs:documentation>ARGENTINA (+54)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AM">
+        <xs:annotation>
+          <xs:documentation>ARMENIA (+374)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AW">
+        <xs:annotation>
+          <xs:documentation>ARUBA (+297)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AU">
+        <xs:annotation>
+          <xs:documentation>AUSTRALIA (+61)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AT">
+        <xs:annotation>
+          <xs:documentation>AUSTRIA (+43)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AZ">
+        <xs:annotation>
+          <xs:documentation>AZERBAIJAN (+994)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BS">
+        <xs:annotation>
+          <xs:documentation>BAHAMAS (+1242)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BH">
+        <xs:annotation>
+          <xs:documentation>BAHRAIN (+973)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BD">
+        <xs:annotation>
+          <xs:documentation>BANGLADESH (+880)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BB">
+        <xs:annotation>
+          <xs:documentation>BARBADOS (+1246)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BY">
+        <xs:annotation>
+          <xs:documentation>BELARUS (+375)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BE">
+        <xs:annotation>
+          <xs:documentation>BELGIUM (+32)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BZ">
+        <xs:annotation>
+          <xs:documentation>BELIZE (+501)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BJ">
+        <xs:annotation>
+          <xs:documentation>BENIN (+229)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BM">
+        <xs:annotation>
+          <xs:documentation>BERMUDA (+1441)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BT">
+        <xs:annotation>
+          <xs:documentation>BHUTAN (+975)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BO">
+        <xs:annotation>
+          <xs:documentation>BOLIVIA (+591)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BA">
+        <xs:annotation>
+          <xs:documentation>BOSNIA AND HERZEGOVINA (+387)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BW">
+        <xs:annotation>
+          <xs:documentation>BOTSWANA (+267)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BV">
+        <xs:annotation>
+          <xs:documentation>BOUVET ISLAND (+)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BR">
+        <xs:annotation>
+          <xs:documentation>BRAZIL (+55)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IO">
+        <xs:annotation>
+          <xs:documentation>BRITISH INDIAN OCEAN TERRITORY (+246)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BN">
+        <xs:annotation>
+          <xs:documentation>BRUNEI (+673)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BG">
+        <xs:annotation>
+          <xs:documentation>BULGARIA (+359)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BF">
+        <xs:annotation>
+          <xs:documentation>BURKINA FASO (+226)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BI">
+        <xs:annotation>
+          <xs:documentation>BURUNDI (+257)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KH">
+        <xs:annotation>
+          <xs:documentation>CAMBODIA (+855)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CM">
+        <xs:annotation>
+          <xs:documentation>CAMEROON (+237)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CV">
+        <xs:annotation>
+          <xs:documentation>CAPE VERDE (+238)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CA">
+        <xs:annotation>
+          <xs:documentation>CANADA (+1)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KY">
+        <xs:annotation>
+          <xs:documentation>CAYMAN ISLANDS (+1345)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CF">
+        <xs:annotation>
+          <xs:documentation>CENTRAL AFRICAN REPUBLIC (+236)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TD">
+        <xs:annotation>
+          <xs:documentation>CHAD (+235)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CL">
+        <xs:annotation>
+          <xs:documentation>CHILE (+56)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CN">
+        <xs:annotation>
+          <xs:documentation>CHINA (+86)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CX">
+        <xs:annotation>
+          <xs:documentation>CHRISTMAS ISLAND (+61)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CC">
+        <xs:annotation>
+          <xs:documentation>COCOS ISLANDS (+61)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CO">
+        <xs:annotation>
+          <xs:documentation>COLOMBIA (+57)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KM">
+        <xs:annotation>
+          <xs:documentation>COMOROS (+269)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CD">
+        <xs:annotation>
+          <xs:documentation>DEMOCRATIC REPUBLIC OF THE CONGO (+243)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CG">
+        <xs:annotation>
+          <xs:documentation>REPUBLIC OF THE CONGO (+242)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CK">
+        <xs:annotation>
+          <xs:documentation>COOK ISLANDS (+682)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CR">
+        <xs:annotation>
+          <xs:documentation>COSTA RICA (+506)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CI">
+        <xs:annotation>
+          <xs:documentation>COTE DIVOIRE (+225)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HR">
+        <xs:annotation>
+          <xs:documentation>CROATIA (+385)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CU">
+        <xs:annotation>
+          <xs:documentation>CUBA (+53)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CY">
+        <xs:annotation>
+          <xs:documentation>CYPRUS (+357)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CZ">
+        <xs:annotation>
+          <xs:documentation>CZECH REPUBLIC (+420)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DK">
+        <xs:annotation>
+          <xs:documentation>DENMARK (+45)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DJ">
+        <xs:annotation>
+          <xs:documentation>DJIBOUTI (+253)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DM">
+        <xs:annotation>
+          <xs:documentation>DOMINICA (+1767)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DO">
+        <xs:annotation>
+          <xs:documentation>DOMINICAN REPUBLIC (+1)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TL">
+        <xs:annotation>
+          <xs:documentation>EAST TIMOR (+670)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="EC">
+        <xs:annotation>
+          <xs:documentation>ECUADOR (+593)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SV">
+        <xs:annotation>
+          <xs:documentation>EL SALVADOR (+503)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="EG">
+        <xs:annotation>
+          <xs:documentation>EGYPT (+20)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GQ">
+        <xs:annotation>
+          <xs:documentation>EQUATORIAL GUINEA (+240)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ER">
+        <xs:annotation>
+          <xs:documentation>ERITREA (+291)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="EE">
+        <xs:annotation>
+          <xs:documentation>ESTONIA (+372)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ET">
+        <xs:annotation>
+          <xs:documentation>ETHIOPIA (+251)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="FK">
+        <xs:annotation>
+          <xs:documentation>FALKLAND ISLANDS (+500)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="FO">
+        <xs:annotation>
+          <xs:documentation>FAROE ISLANDS (+298)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="FJ">
+        <xs:annotation>
+          <xs:documentation>FIJI (+679)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="FI">
+        <xs:annotation>
+          <xs:documentation>FINLAND (+358)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="FR">
+        <xs:annotation>
+          <xs:documentation>FRANCE (+33)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GF">
+        <xs:annotation>
+          <xs:documentation>FRENCH GUIANA (+594)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PF">
+        <xs:annotation>
+          <xs:documentation>FRENCH POLYNESIA (+689)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TF">
+        <xs:annotation>
+          <xs:documentation>FRENCH SOUTHERN TERRITORIES (+)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GA">
+        <xs:annotation>
+          <xs:documentation>GABON (+241)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GM">
+        <xs:annotation>
+          <xs:documentation>GAMBIA (+220)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GE">
+        <xs:annotation>
+          <xs:documentation>GEORGIA (+995)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DE">
+        <xs:annotation>
+          <xs:documentation>GERMANY (+49)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GH">
+        <xs:annotation>
+          <xs:documentation>GHANA (+233)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GI">
+        <xs:annotation>
+          <xs:documentation>GIBRALTAR (+350)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GR">
+        <xs:annotation>
+          <xs:documentation>GREECE (+30)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GL">
+        <xs:annotation>
+          <xs:documentation>GREENLAND (+299)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GD">
+        <xs:annotation>
+          <xs:documentation>GRENADA (+1473)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GP">
+        <xs:annotation>
+          <xs:documentation>GUADELOUPE (+590)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GU">
+        <xs:annotation>
+          <xs:documentation>GUAM (+1671)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GT">
+        <xs:annotation>
+          <xs:documentation>GUATEMALA (+502)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GN">
+        <xs:annotation>
+          <xs:documentation>GUINEA (+224)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GG">
+        <xs:annotation>
+          <xs:documentation>GUERNSEY (+44)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GW">
+        <xs:annotation>
+          <xs:documentation>GUINEA BISSAU (+245)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GY">
+        <xs:annotation>
+          <xs:documentation>GUYANA (+592)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HT">
+        <xs:annotation>
+          <xs:documentation>HAITI (+509)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HM">
+        <xs:annotation>
+          <xs:documentation>HEARD ISLAND AND MCDONALD ISLANDS (+)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HN">
+        <xs:annotation>
+          <xs:documentation>HONDURAS (+504)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HK">
+        <xs:annotation>
+          <xs:documentation>HONG KONG (+852)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HU">
+        <xs:annotation>
+          <xs:documentation>HUNGARY (+36)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IS">
+        <xs:annotation>
+          <xs:documentation>ICELAND (+354)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IN">
+        <xs:annotation>
+          <xs:documentation>INDIA (+91)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ID">
+        <xs:annotation>
+          <xs:documentation>INDONESIA (+62)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IR">
+        <xs:annotation>
+          <xs:documentation>IRAN (+98)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IQ">
+        <xs:annotation>
+          <xs:documentation>IRAQ (+964)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IE">
+        <xs:annotation>
+          <xs:documentation>IRELAND (+353)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IM">
+        <xs:annotation>
+          <xs:documentation>ISLE OF MAN (+44)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IL">
+        <xs:annotation>
+          <xs:documentation>ISRAEL (+972)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="IT">
+        <xs:annotation>
+          <xs:documentation>ITALY (+39)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="JM">
+        <xs:annotation>
+          <xs:documentation>JAMAICA (+1876)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="JP">
+        <xs:annotation>
+          <xs:documentation>JAPAN (+81)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="JE">
+        <xs:annotation>
+          <xs:documentation>JERSEY (+44)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="JO">
+        <xs:annotation>
+          <xs:documentation>JORDAN (+962)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KZ">
+        <xs:annotation>
+          <xs:documentation>KAZAKHSTAN (+7)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KE">
+        <xs:annotation>
+          <xs:documentation>KENYA (+254)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KI">
+        <xs:annotation>
+          <xs:documentation>KIRIBATI (+686)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KW">
+        <xs:annotation>
+          <xs:documentation>KUWAIT (+965)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KG">
+        <xs:annotation>
+          <xs:documentation>KYRGYZSTAN (+996)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LA">
+        <xs:annotation>
+          <xs:documentation>LAOS (+856)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LV">
+        <xs:annotation>
+          <xs:documentation>LATVIA (+371)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LB">
+        <xs:annotation>
+          <xs:documentation>LEBANON (+961)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LS">
+        <xs:annotation>
+          <xs:documentation>LESOTHO (+266)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LR">
+        <xs:annotation>
+          <xs:documentation>LIBERIA (+231)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LY">
+        <xs:annotation>
+          <xs:documentation>LIBYA (+218)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LI">
+        <xs:annotation>
+          <xs:documentation>LIECHTENSTEIN (+423)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LT">
+        <xs:annotation>
+          <xs:documentation>LITHUANIA (+370)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LU">
+        <xs:annotation>
+          <xs:documentation>LUXEMBOURG (+352)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MO">
+        <xs:annotation>
+          <xs:documentation>MACAU (+853)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MK">
+        <xs:annotation>
+          <xs:documentation>MACEDONIA (+389)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MG">
+        <xs:annotation>
+          <xs:documentation>MADAGASCAR (+261)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MW">
+        <xs:annotation>
+          <xs:documentation>MALAWI (+265)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MY">
+        <xs:annotation>
+          <xs:documentation>MALAYSIA (+60)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MV">
+        <xs:annotation>
+          <xs:documentation>MALDIVES (+960)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ML">
+        <xs:annotation>
+          <xs:documentation>MALI (+223)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MT">
+        <xs:annotation>
+          <xs:documentation>MALTA (+356)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MH">
+        <xs:annotation>
+          <xs:documentation>MARSHALL ISLANDS (+692)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MQ">
+        <xs:annotation>
+          <xs:documentation>MARTINIQUE (+596)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MR">
+        <xs:annotation>
+          <xs:documentation>MAURITANIA (+222)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MU">
+        <xs:annotation>
+          <xs:documentation>MAURITIUS (+230)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="YT">
+        <xs:annotation>
+          <xs:documentation>MAYOTTE (+262)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MX">
+        <xs:annotation>
+          <xs:documentation>MEXICO (+52)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="FM">
+        <xs:annotation>
+          <xs:documentation>MICRONESIA (+691)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MD">
+        <xs:annotation>
+          <xs:documentation>MOLDOVA (+373)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MC">
+        <xs:annotation>
+          <xs:documentation>MONACO (+377)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MN">
+        <xs:annotation>
+          <xs:documentation>MONGOLIA (+976)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ME">
+        <xs:annotation>
+          <xs:documentation>MONTENEGRO (+382)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MS">
+        <xs:annotation>
+          <xs:documentation>MONTSERRAT (+1664)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MA">
+        <xs:annotation>
+          <xs:documentation>MOROCCO (+212)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MZ">
+        <xs:annotation>
+          <xs:documentation>MOZAMBIQUE (+258)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MM">
+        <xs:annotation>
+          <xs:documentation>MYANMAR (+95)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NA">
+        <xs:annotation>
+          <xs:documentation>NAMIBIA (+264)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NR">
+        <xs:annotation>
+          <xs:documentation>NAURU (+674)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NP">
+        <xs:annotation>
+          <xs:documentation>NEPAL (+977)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NL">
+        <xs:annotation>
+          <xs:documentation>NETHERLANDS (+31)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AN">
+        <xs:annotation>
+          <xs:documentation>NETHERLANDS ANTILLES (+599)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NC">
+        <xs:annotation>
+          <xs:documentation>NEW CALEDONIA (+687)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NZ">
+        <xs:annotation>
+          <xs:documentation>NEW ZEALAND (+64)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NI">
+        <xs:annotation>
+          <xs:documentation>NICARAGUA (+505)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NE">
+        <xs:annotation>
+          <xs:documentation>NIGER (+227)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NG">
+        <xs:annotation>
+          <xs:documentation>NIGERIA (+234)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NU">
+        <xs:annotation>
+          <xs:documentation>NIUE (+683)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NF">
+        <xs:annotation>
+          <xs:documentation>NORFOLK ISLAND (+672)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KP">
+        <xs:annotation>
+          <xs:documentation>NORTH KOREA (+850)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MP">
+        <xs:annotation>
+          <xs:documentation>NORTHERN MARIANA ISLANDS (+1670)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NO">
+        <xs:annotation>
+          <xs:documentation>NORWAY (+47)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OM">
+        <xs:annotation>
+          <xs:documentation>OMAN (+968)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PK">
+        <xs:annotation>
+          <xs:documentation>PAKISTAN (+92)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PW">
+        <xs:annotation>
+          <xs:documentation>PALAU (+680)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PS">
+        <xs:annotation>
+          <xs:documentation>PALESTINE (+970)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PA">
+        <xs:annotation>
+          <xs:documentation>PANAMA (+507)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PG">
+        <xs:annotation>
+          <xs:documentation>PAPUA NEW GUINEA (+675)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PY">
+        <xs:annotation>
+          <xs:documentation>PARAGUAY (+595)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PE">
+        <xs:annotation>
+          <xs:documentation>PERU (+51)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PH">
+        <xs:annotation>
+          <xs:documentation>PHILIPPINES (+63)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PN">
+        <xs:annotation>
+          <xs:documentation>PITCAIRN (+)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PL">
+        <xs:annotation>
+          <xs:documentation>POLAND (+48)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PT">
+        <xs:annotation>
+          <xs:documentation>PORTUGAL (+351)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PR">
+        <xs:annotation>
+          <xs:documentation>PUERTO RICO (+1)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="QA">
+        <xs:annotation>
+          <xs:documentation>QATAR (+974)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RE">
+        <xs:annotation>
+          <xs:documentation>REUNION (+262)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RO">
+        <xs:annotation>
+          <xs:documentation>ROMANIA (+40)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RW">
+        <xs:annotation>
+          <xs:documentation>RWANDA (+250)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RU">
+        <xs:annotation>
+          <xs:documentation>RUSSIA (+7)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="BL">
+        <xs:annotation>
+          <xs:documentation>SAINT BARTHELEMY (+590)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SH">
+        <xs:annotation>
+          <xs:documentation>SAINT HELENA (+290)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KN">
+        <xs:annotation>
+          <xs:documentation>SAINT KITTS AND NEVIS (+1869)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LC">
+        <xs:annotation>
+          <xs:documentation>SAINT LUCIA (+1758)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MF">
+        <xs:annotation>
+          <xs:documentation>SAINT-MARTIN (+590)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PM">
+        <xs:annotation>
+          <xs:documentation>SAINT-PIERRE AND MIQUELON (+508)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VC">
+        <xs:annotation>
+          <xs:documentation>SAINT VINCENT AND THE GRENADINES (+1784)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="WS">
+        <xs:annotation>
+          <xs:documentation>SAMOA (+685)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SM">
+        <xs:annotation>
+          <xs:documentation>SAN MARINO (+378)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ST">
+        <xs:annotation>
+          <xs:documentation>SAO TOME AND PRINCIPE (+239)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SA">
+        <xs:annotation>
+          <xs:documentation>SAUDI ARABIA (+966)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SN">
+        <xs:annotation>
+          <xs:documentation>SENEGAL (+221)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RS">
+        <xs:annotation>
+          <xs:documentation>SERBIA (+381)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SC">
+        <xs:annotation>
+          <xs:documentation>SEYCHELLES (+248)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SL">
+        <xs:annotation>
+          <xs:documentation>SIERRA LEONE (+232)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SG">
+        <xs:annotation>
+          <xs:documentation>SINGAPORE (+65)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SK">
+        <xs:annotation>
+          <xs:documentation>SLOVAKIA (+421)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SI">
+        <xs:annotation>
+          <xs:documentation>SLOVENIA (+386)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SB">
+        <xs:annotation>
+          <xs:documentation>SOLOMON ISLANDS (+677)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SO">
+        <xs:annotation>
+          <xs:documentation>SOMALIA (+252)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ZA">
+        <xs:annotation>
+          <xs:documentation>SOUTH AFRICA (+27)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GS">
+        <xs:annotation>
+          <xs:documentation>SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS (+)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="KR">
+        <xs:annotation>
+          <xs:documentation>SOUTH KOREA (+82)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ES">
+        <xs:annotation>
+          <xs:documentation>SPAIN (+34)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LK">
+        <xs:annotation>
+          <xs:documentation>SRI LANKA (+94)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SD">
+        <xs:annotation>
+          <xs:documentation>SUDAN (+249)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SR">
+        <xs:annotation>
+          <xs:documentation>SURINAME (+597)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SJ">
+        <xs:annotation>
+          <xs:documentation>SVALBARD AND JAN MAYEN (+47)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SZ">
+        <xs:annotation>
+          <xs:documentation>SWAZILAND (+268)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SE">
+        <xs:annotation>
+          <xs:documentation>SWEDEN (+46)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CH">
+        <xs:annotation>
+          <xs:documentation>SWITZERLAND (+41)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SY">
+        <xs:annotation>
+          <xs:documentation>SYRIA (+963)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TW">
+        <xs:annotation>
+          <xs:documentation>TAIWAN (+886)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TJ">
+        <xs:annotation>
+          <xs:documentation>TAJIKISTAN (+992)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TZ">
+        <xs:annotation>
+          <xs:documentation>TANZANIA (+255)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TH">
+        <xs:annotation>
+          <xs:documentation>THAILAND (+66)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TG">
+        <xs:annotation>
+          <xs:documentation>TOGO (+228)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TK">
+        <xs:annotation>
+          <xs:documentation>TOKELAU (+690)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TO">
+        <xs:annotation>
+          <xs:documentation>TONGA (+676)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TT">
+        <xs:annotation>
+          <xs:documentation>TRINIDAD AND TOBAGO (+1868)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TN">
+        <xs:annotation>
+          <xs:documentation>TUNISIA (+216)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TR">
+        <xs:annotation>
+          <xs:documentation>TURKEY (+90)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TM">
+        <xs:annotation>
+          <xs:documentation>TURKMENISTAN (+993)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TC">
+        <xs:annotation>
+          <xs:documentation>TURKS AND CAICOS ISLANDS (+1649)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TV">
+        <xs:annotation>
+          <xs:documentation>TUVALU (+688)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="UG">
+        <xs:annotation>
+          <xs:documentation>UGANDA (+256)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="UA">
+        <xs:annotation>
+          <xs:documentation>UKRAINE (+380)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AE">
+        <xs:annotation>
+          <xs:documentation>UNITED ARAB EMIRATES (+971)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="GB">
+        <xs:annotation>
+          <xs:documentation>UNITED KINGDOM (+44)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="UY">
+        <xs:annotation>
+          <xs:documentation>URUGUAY (+598)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="US">
+        <xs:annotation>
+          <xs:documentation>USA (+1)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="UM">
+        <xs:annotation>
+          <xs:documentation>UNITED STATES MINOR OUTLYING ISLANDS (+)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="UZ">
+        <xs:annotation>
+          <xs:documentation>UZBEKISTAN (+998)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VU">
+        <xs:annotation>
+          <xs:documentation>VANUATU (+678)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VA">
+        <xs:annotation>
+          <xs:documentation>VATICAN CITY (+379)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VN">
+        <xs:annotation>
+          <xs:documentation>VIETNAM (+84)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VG">
+        <xs:annotation>
+          <xs:documentation>BRITISH VIRGIN ISLANDS (+1284)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VI">
+        <xs:annotation>
+          <xs:documentation>UNITED STATES VIRGIN ISLANDS (+1340)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VE">
+        <xs:annotation>
+          <xs:documentation>VENEZUELA (+58)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="YE">
+        <xs:annotation>
+          <xs:documentation>YEMEN (+967)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="WF">
+        <xs:annotation>
+          <xs:documentation>WALLIS AND FUTUNA (+681)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="EH">
+        <xs:annotation>
+          <xs:documentation>WESTERN SAHARA (+)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ZM">
+        <xs:annotation>
+          <xs:documentation>ZAMBIA (+260)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ZW">
+        <xs:annotation>
+          <xs:documentation>ZIMBABWE (+263)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_race_type_list">
+    <xs:list itemType="base_race_type_single" />
+  </xs:simpleType>
+  <xs:simpleType name="base_race_type_single">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="AMERICAN_INDIAN" />
+      <xs:enumeration value="ASIAN" />
+      <xs:enumeration value="BLACK" />
+      <xs:enumeration value="PACIFIC_ISLANDER" />
+      <xs:enumeration value="WHITE" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_money">
+    <xs:restriction base="xs:decimal">
+      <xs:totalDigits value="19" />
+      <xs:fractionDigits value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_employee_of_lender_types">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NONE" />
+      <xs:enumeration value="EMPLOYEE" />
+      <xs:enumeration value="MANAGER" />
+      <xs:enumeration value="EXECUTIVE" />
+      <xs:enumeration value="BOARDMEMBER" />
+      <xs:enumeration value="EMPLOYEEFAMILY" />
+      <xs:enumeration value="BOARDFAMILY" />
+      <xs:enumeration value="OTHER" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_applicant_type">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1" />
+      <xs:enumeration value="P" />
+      <xs:enumeration value="C" />
+      <xs:enumeration value="S" />
+      <xs:enumeration value="G" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_zip">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_guid">
+    <xs:annotation>
+      <xs:documentation>Most of our ID's are 32 char.  However, for convenience some of our new id fields will be using this hex guid version instead.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\w{8}\-\w{4}\-\w{4}\-\w{4}\-\w{12}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_business_id_type">
+    <xs:annotation>
+      <xs:documentation>Possible Values: ART_INCORP, FIT_BUS_NAME_STMT, BUSINESS_LICENSE, GEN_PARTN_AGREE, CERT_LTD_PARTN, JOINT_VENT_AGREE, LLP_AGREEMENT, LLC_STMT_INFO, LETTER_AUTH, PROOF_OF_PUB, STMT_FOREIGN_PART, FOREIGN_LIMIT_PART, STATEMENT_INFO, LLC_ART_ORG, DRIVERS_LICENSE, LLC_OP_AGREE, LP_AGREE, OTHER-APPLICANT, SUNBIZ, SEC_STATE_CERT, CERT_DBA. Or any customized business id type value.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="50" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_payment_account_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CHECKING" />
+      <xs:enumeration value="SAVINGS" />
+      <xs:enumeration value="" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_payment_account_number">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="40" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="base_payment_name_on_account">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="100" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="BASE_HMDA_INFO">
+    <xs:attribute name="property_address" type="xs:string" />
+    <xs:attribute name="property_city" type="xs:string" />
+    <xs:attribute name="property_state" type="base_state" />
+    <xs:attribute name="property_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="SFR" />
+          <xs:enumeration value="2 UNIT" />
+          <xs:enumeration value="3 UNIT" />
+          <xs:enumeration value="4 UNIT" />
+          <xs:enumeration value="5+ UNIT" />
+          <xs:enumeration value="TOWNHOUSE" />
+          <xs:enumeration value="HIGH RISE CONDO" />
+          <xs:enumeration value="LOW RISE CONDO" />
+          <xs:enumeration value="PUD" />
+          <xs:enumeration value="MOBILE HOME" />
+          <xs:enumeration value="MANUFACTURED HOME" />
+          <xs:enumeration value="MIXED USE" />
+          <xs:enumeration value="CONDOTEL" />
+          <xs:enumeration value="COOP" />
+          <xs:enumeration value="COMMERCIAL" />
+          <xs:enumeration value="FARM" />
+          <xs:enumeration value="HOME BUSINESS" />
+          <xs:enumeration value="LAND" />
+          <xs:enumeration value="OTHER" />
+          <xs:enumeration value="MNL" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_zip" type="base_zip" />
+    <xs:attribute name="is_hoepa" type="base_YN" />
+    <xs:attribute name="is_hoepa_manual" type="base_YN" />
+    <xs:attribute name="lien_position" type="xs:int" />
+    <xs:attribute name="hmda_loan_purpose" type="xs:string" />
+    <xs:attribute name="property_occupancy_status">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="INVESTMENT" />
+          <xs:enumeration value="PRIMARY RESIDENCE" />
+          <xs:enumeration value="SECOND HOME" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="msa_number" type="xs:string" use="optional" />
+    <xs:attribute name="property_tax_id" type="xs:string" use="optional" />
+    <xs:attribute name="census_tract_number" type="xs:string" use="optional" />
+    <xs:attribute name="property_county" type="xs:string" />
+    <xs:attribute name="property_county_code" type="xs:string" />
+    <xs:attribute name="state_code" type="xs:string" use="optional" />
+    <xs:attribute name="interview_method">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="TELEPHONE" />
+          <xs:enumeration value="FACETOFACE" />
+          <xs:enumeration value="INTERNET" />
+          <xs:enumeration value="MAIL" />
+          <xs:enumeration value="FAX" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="purchaser">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="NOT_ORIGINATED" />
+          <xs:enumeration value="FANNIE_MAE" />
+          <xs:enumeration value="GINNIE_MAE" />
+          <xs:enumeration value="FREDDIE_MAC" />
+          <xs:enumeration value="FARMER_MAC" />
+          <xs:enumeration value="PRIVATE" />
+          <xs:enumeration value="COMMERCIAL" />
+          <xs:enumeration value="LIFE_INSURANCE" />
+          <xs:enumeration value="AFFILIATE" />
+          <xs:enumeration value="OTHER" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_address_verification_date" type="xs:date" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="BASE_HMDA_XML">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="ITEM">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="key" type="xs:string" />
+              <xs:attribute name="valueAttribute" type="xs:string" />
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="version" />
+  </xs:complexType>
+  <xs:complexType name="BASE_ID_CARD">
+    <xs:attribute name="card_type">
+      <xs:annotation>
+        <xs:documentation>Possible Values: ID_CARD, OTHER, STUDENT_ID, MILITARY_ID, PASSPORT, DRIVERS_LICENSE, ALIEN_REG_CARD, HAND_GUN_LIC, EMPLOYER_ID, FOREIGN_ID, SOCIAL_SECURITY, AUTO_INSURANCE, NON_RESIDENT_VISA, MEDICARE_MEDICAID, UTIL_BILL, FRGN_DRVRS, TAX_BILL, BIRTH_CERT, ORG_MEMBER, VOTER_REG, PUB_ASST_CARD, BADGE, GUN_REG, PHONE, CREDIT, EMPLOYMENT, CREDIT_DEBIT_CARD, DEPART_STORE_CARD, AUTOMOBILE_REG, KNOWN_BY_EMPLOYEE, MEMBER_REFERENCE, CUSTOMER_REFERENCE, SF_CITY_ID, MATR_CONS_ID, GUAT_CONS_ID, empty string or any customized id card type value.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="card_number" type="xs:string" />
+    <xs:attribute name="state" type="base_state" />
+    <xs:attribute name="country" type="xs:string" use="optional" />
+    <xs:attribute name="exp_date" type="xs:date" />
+    <xs:attribute name="date_issued" type="xs:date" />
+  </xs:complexType>
+  <xs:complexType name="DECLARATIONS">
+    <xs:attribute name="has_judge_bankrupt_foreclosure" type="base_YN" />
+    <xs:attribute name="has_declare_bankrupt" type="base_YN" />
+    <xs:attribute name="has_chapter_13" type="base_YN" />
+    <xs:attribute name="has_lawsuit_party" type="base_YN" />
+    <xs:attribute name="has_judgement" type="base_YN" />
+    <xs:attribute name="has_foreclosure" type="base_YN" />
+    <xs:attribute name="has_reposession" type="base_YN" />
+    <xs:attribute name="has_other_obligation" type="base_YN" />
+    <xs:attribute name="has_past_due_bills" type="base_YN" />
+    <xs:attribute name="has_co_maker" type="base_YN" />
+    <xs:attribute name="co_maker_primary_name" type="xs:string" />
+    <xs:attribute name="co_maker_creditor" type="xs:string" />
+    <xs:attribute name="co_maker_amount" type="base_money" />
+    <xs:attribute name="has_alias" type="base_YN" />
+    <xs:attribute name="alias" type="xs:string" />
+    <xs:attribute name="has_income_decline" type="base_YN" />
+    <xs:attribute name="has_suits_pending" type="base_YN" />
+    <xs:attribute name="has_alimony" type="base_YN" />
+    <xs:attribute name="alimony_recipient" type="xs:string" />
+    <xs:attribute name="alimony_recipient_address" type="xs:string" />
+    <xs:attribute name="has_property_for_sale" type="base_YN" />
+  </xs:complexType>
+  <xs:complexType name="FOM_ANSWERED_QUESTIONS">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FOM_ANSWERED_QUESTION">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="text_template" type="xs:string" />
+            <xs:element name="FOM_ANSWERS">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="FOM_ANSWER">
+                    <xs:complexType>
+                      <xs:all>
+                        <xs:element name="text" type="xs:string" />
+                        <xs:element name="value" type="xs:string" />
+                      </xs:all>
+                      <xs:attribute name="field_type">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="TEXTBOX" />
+                            <xs:enumeration value="DROPDOWN" />
+                            <xs:enumeration value="GEOCODE_LOOKUP" />
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SKIP_PAYMENT_INFO">
+    <xs:attribute name="skip_payment_template_name" type="xs:string" />
+    <xs:attribute name="is_position_of_skips_first_pay_skip" type="base_YN" />
+    <xs:attribute name="is_defer_skip_payments" type="base_YN" />
+    <xs:attribute name="skips_per_year" type="xs:integer" />
+    <xs:attribute name="position_of_skips" type="xs:integer" />
+    <xs:attribute name="skip_start_date" type="xs:date" />
+    <xs:attribute name="skip_end_date" type="xs:date" />
+    <xs:attribute name="skip_period_month_day_start" type="xs:date" />
+    <xs:attribute name="skip_period_month_day_end" type="xs:date" />
+  </xs:complexType>
+  <xs:complexType name="PAYMENT_COUPON_BOOK_INFO">
+    <xs:attribute name="account_number" type="base_payment_account_number" />
+  </xs:complexType>
+  <xs:complexType name="PAYMENT_PAYROLL_DEDUCTION_INFO">
+    <xs:attribute name="account_number" type="base_payment_account_number" />
+  </xs:complexType>
+  <xs:complexType name="PAYMENT_MANUAL_NO_COUPON_INFO">
+    <xs:attribute name="account_number" type="base_payment_account_number" />
+  </xs:complexType>
+  <xs:complexType name="PAYMENT_TRANSFER_FROM_INTERNAL_ACCOUNT_INFO">
+    <xs:attribute name="account_type" type="base_payment_account_type" />
+    <xs:attribute name="account_number" type="base_payment_account_number" />
+    <xs:attribute name="name_on_account" type="base_payment_name_on_account" />
+  </xs:complexType>
+  <xs:complexType name="PAYMENT_TRANSFER_FROM_OTHER_INSTITUTION_INFO">
+    <xs:attribute name="account_type" type="base_payment_account_type" />
+    <xs:attribute name="account_number" type="base_payment_account_number" />
+    <xs:attribute name="name_on_account" type="base_payment_name_on_account" />
+    <xs:attribute name="bank_routing_number">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bank_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="200" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bank_zip">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bank_city">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bank_state" type="base_state" />
+  </xs:complexType>
+  <xs:complexType name="INTEGRATION_DATA" abstract="true" />
+  <xs:complexType name="APP">
+    <xs:attribute name="version" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:maxInclusive value="5.225" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="BASE_LOAN_CONTACTS">
+    <xs:annotation>
+      <xs:documentation>List of Contacts used by app (applies only to loans).  Note other attributes that reference index in this list should be ZERO based.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="CONTACT_INFO">
+        <xs:complexType>
+          <xs:attribute name="contact_type" use="required">
+            <xs:annotation>
+              <xs:documentation>
+                <item value="TITLEDPER" text="TITLED PERSON" enum_name="TitledPerson" />
+                <item value="ASSETOWN" text="ASSET OWNER" enum_name="AssetOwner" />
+                <item value="OTHER" text="OTHER" enum_name="Other" />
+                <item value="INSAGENT" text="INSURANCE AGENT" enum_name="INSURANCEAGENT" />
+                <item value="APPLICANT" text="APPLICANT" enum_name="Applicant" />
+                <item value="NSS" text="NON SIGNING SPOUSE" enum_name="NonSigningSpouse" />
+                <item value="SELLER" text="SELLER" enum_name="Seller" />
+                <item value="BUSINESS" text="BUSINESS" enum_name="Business" />
+								<item value="TRUST" text="TRUST" enum_name="Trust" />
+              </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="ASSETOWN" />
+                <xs:enumeration value="INSAGENT" />
+                <xs:enumeration value="TITLEDPER" />
+                <xs:enumeration value="OTHER" />
+                <xs:enumeration value="SELLER" />
+                <xs:enumeration value="NSS" />
+                <xs:enumeration value="APPLICANT" />
+                <xs:enumeration value="BUSINESS" />
+                <xs:enumeration value="TRUST" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="first_name" type="xs:string" />
+          <xs:attribute name="middle_name" type="xs:string" />
+          <xs:attribute name="last_name" type="xs:string" />
+          <xs:attribute name="suffix" type="xs:string" />
+          <xs:attribute name="address" type="xs:string" />
+          <xs:attribute name="city" type="xs:string" />
+          <xs:attribute name="state" type="xs:string" />
+          <xs:attribute name="zip" type="xs:string" />
+          <xs:attribute name="phone" type="xs:string" />
+          <xs:attribute name="work_phone" type="xs:string" />
+          <xs:attribute name="fax" type="xs:string" />
+          <xs:attribute name="cell" type="xs:string" />
+          <xs:attribute name="pager" type="xs:string" />
+          <xs:attribute name="email" type="xs:string" />
+          <xs:attribute name="company_name" type="xs:string" />
+          <xs:attribute name="department_name" type="xs:string" />
+          <xs:attribute name="company_address" type="xs:string" />
+          <xs:attribute name="company_city" type="xs:string" />
+          <xs:attribute name="company_state" type="base_state" />
+          <xs:attribute name="company_zip" type="xs:string" />
+          <xs:attribute name="company_phone" type="xs:string" />
+          <xs:attribute name="company_fax" type="xs:string" />
+          <xs:attribute name="county" type="xs:string" />
+          <xs:attribute name="notes">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="1000" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="ssn" type="xs:string" />
+          <xs:attribute name="dob" type="xs:date" />
+          <xs:attribute name="is_ssn_taxid" type="base_YN" />
+          <xs:attribute name="paac" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BASE_MODIFICATION_HISTORY">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="AUDIT">
+        <xs:complexType mixed="true">
+          <xs:attribute name="modification_date" type="xs:dateTime" />
+          <xs:attribute name="modifier_name" type="xs:string" />
+          <xs:attribute name="modifier_type" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BASE_EVENT_HISTORY">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="EVENT">
+        <xs:complexType>
+          <xs:attribute name="timestamp" type="xs:dateTime" />
+          <xs:attribute name="username" type="xs:string" />
+          <xs:attribute name="event" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BASE_WEBMS_HISTORY">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="MESSAGE">
+        <xs:complexType>
+          <xs:attribute name="time" type="xs:dateTime" />
+          <xs:attribute name="name" type="xs:string" />
+          <xs:attribute name="type" type="xs:string" />
+          <xs:attribute name="text" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BENEFICIAL_OWNERS">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="BENEFICIAL_OWNER">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ID_CARD" type="BASE_ID_CARD" />
+          </xs:sequence>
+          <xs:attribute name="first_name" type="xs:string" />
+          <xs:attribute name="middle_name" type="xs:string" />
+          <xs:attribute name="last_name" type="xs:string" />
+          <xs:attribute name="suffix" type="xs:string" />
+          <xs:attribute name="dob" type="xs:date" />
+          <xs:attribute name="is_tin_ssn" type="base_YN" />
+          <xs:attribute name="ssn" type="xs:string" />
+          <xs:attribute name="address" type="xs:string" />
+          <xs:attribute name="city" type="xs:string" />
+          <xs:attribute name="state" type="xs:string" />
+          <xs:attribute name="zip" type="xs:string" />
+          <xs:attribute name="is_beneficial_owner" type="base_YN" />
+          <xs:attribute name="percent_business_owned" type="xs:double" />
+          <xs:attribute name="is_control" type="base_YN" />
+          <xs:attribute name="is_authorized_credit_report" type="base_YN" />
+          <xs:attribute name="citizenship">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="USCITIZEN" />
+                <xs:enumeration value="PERMRESIDENT" />
+                <xs:enumeration value="NONPERMRESIDENT" />
+                <xs:enumeration value="NONRESIDENTALIEN" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="control_title">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="AGENT" />
+                <xs:enumeration value="CORP_REP" />
+                <xs:enumeration value="MANAGER" />
+                <xs:enumeration value="OWNER" />
+                <xs:enumeration value="PARTNER" />
+                <xs:enumeration value="PRESIDENT" />
+                <xs:enumeration value="SECRETARY" />
+                <xs:enumeration value="TREASURER" />
+                <xs:enumeration value="VICE_PRESIDENT" />
+                <xs:enumeration value="MEMBER" />
+                <xs:enumeration value="DIRECTOR" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="is_ofac_istwatch" type="base_YN" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

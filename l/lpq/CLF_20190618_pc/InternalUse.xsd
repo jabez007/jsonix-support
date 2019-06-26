@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+As the name implies, this schema is to specify what are the internal id's supported by LPQ.  
+
+WARNING: These content (within the InternalUse namespace) are to ONLY be used by LoansPQ internally.   Vendors should not attempt to set these
+as they can be changed without notice or be backward compatibility.
+-->
+<xs:schema xmlns="http://www.meridianlink.com/InternalUse" elementFormDefault="qualified" targetNamespace="http://www.meridianlink.com/InternalUse" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:attribute name="loan_id" type="xs:string" />
+	<xs:attribute name="approved_account_type_id" type="xs:string" />
+	<xs:attribute name="approved_account_type_relation_id" type="xs:string" />
+	<xs:attribute name="selected_guidelines" type="xs:string" />
+	<xs:attribute name ="internal_borrower_id" type="xs:string" />
+	<xs:attribute name ="xa_internal_applicant_type" type="xs:string" />
+	<xs:attribute name ="he_internal_disclosure_codes" type="xs:string" />
+	<xs:attribute name ="internal_account_type_id" type="xs:string" />
+	<xs:attribute name ="internal_id" type="xs:string" />
+	<xs:attribute name="cc_card_number_enc" type="xs:string" />
+	<xs:attribute name ="internal_card_holder_id" type="xs:string" />
+	<xs:attribute name ="internal_business_guarantor_id" type="xs:string" />
+  <xs:attribute name ="internal_business_account_type_id" type="xs:string" />
+</xs:schema>
