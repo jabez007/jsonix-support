@@ -53,7 +53,7 @@ Modification history:
                   </xs:attribute>
                   <xs:attribute name="encoding">
                     <xs:annotation>
-                      <xs:documentation>Default is CDATA encoding.  This will allow clients to easily access data.  However, you cannot nest CDATA - hence if you use base64, then the credit report will be stored as base64 encoded text on the element.</xs:documentation>
+                      <xs:documentation>Default is CDATA encoding.  This will allow clients to easily access data.  However, you cannot nest CDATA -- hence if you use base64, then the credit report will be stored as base64 encoded text on the element.</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                       <xs:restriction base="xs:NMTOKEN">

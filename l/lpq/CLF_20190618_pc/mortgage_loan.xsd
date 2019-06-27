@@ -1,0 +1,3083 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Modification history:
+5.224 - Added borrower_1_index, borrower_2_index, borrower_1_is_spouse, and borrower_2_is_spouse to the INSURNACE_OPTIONS node
+5.223 - Added combined_secured_aggregate_amount_with_lender_no_mortgage
+5.222 - Changed is_ssn_taxid data type to base_YN
+5.215 - Add officer_use_loan_date_for_LOC_expiration and consumer_use_loan_date_for_LOC_expiration to MORTGAGE_LOAN_INFO/BASE_LOAN_INFO
+5.205 - Add interview_method to MORTGAGE_BASE_APPLICANT. Move existing interview_method attribute from LOAN_INFO to APPLICANT AND SPOUSE elements
+5.202 - Add MAPR and IsCalculateMAPR in mortgage_loan.xsd
+5.196 - added mailing_address, mailing_city, mailing_state, mailing_zip to CARD_HOLDER element for CC/HELOC
+5.195 - Rename HELOC_CARDS -> HELOC_CARD_HOLDERS, CARD_INFO -> CARD_HOLDER, middle_initial -> m_initial, added max lengths to first_name and last_name of card holders, and added card_account_number, is_ofac_istwatch, istwatch_transactiondate, internal_card_holder_id to card holders
+5.182 - Allowed multiple CURRENT_EMPLOYMENT nodes
+5.181 - Added 'officer_is_interest_only_payments', 'officer_is_other_non_amortizing', 'officer_is_send_na_hmda', 'officer_prepayment_term', 'consumer_is_interest_only_payments', 'consumer_is_other_non_amortizing', 'consumer_is_send_na_hmda', 'consumer_prepayment_term' to LOAN_INFO tag for ML/HE
+5.176 - Added MNL to property_types enum. Added  business_commercial_purpose, manf_home_land_property_interest, multifamily_affordable_units to PROPERTY_INFO. Added  Other and Home Improvement to purpose.
+5.175 - Added HMDA_XML
+5.171 - Change CLOSING_BRANCH type to type BASE_BRANCH
+5.169 - Make CONTACT_INFO/@contact_type required
+5.168 - Added flood_is_escrow, hazard_is_escrow
+5.150 - Added WebMS, LoanEvent History
+5.148 - Added UserDefined4 UserDefined5 to GFE_AGGREGATE_ADJUSTMENT_INFOS
+5.144 - added employment_end_date to PREVIOUS_EMPLOYMENT
+5.139 - added contact work_phone, address, county, city, state, and zip
+5.136 - added agent nmls and company nmls
+5.133 - change total_interest_percent to total_interest_percent_le and add total_interest_percent_cd
+5.131 - adde mortgage clf
+5.130 - added total_interest_percent, in_five_years_principal, and in_five_years_pimilc to MORTGAGE_FUNDING_INFO
+5.124 - Added consumer_group_name
+5.098 - Add is_qualified_mortgage_manual to Mortgage Loan Info
+5.097 - Add is_qualified_mortgage to Mortgage Loan Info 
+5.084 - Added combined_unsecured_aggregate_amount_with_lender
+5.072 - Changed max size of hmda_msa_number to 20
+5.056 = Added description 
+5.040 - Added DOB, SSN, Mother Maiden Name attributes to HELOC card holders
+5.029 - Added community_name field to PROPERTY_INFO
+5.020 - allow 4 digits for 903 amount per month
+5.019 - Added VESTING as contact type
+5.011 - Added is_hmda_manual field
+5.010 - Added has_property_for_sale to the declarations
+5.002 - Initial version
+-->
+<xs:schema xmlns="http://www.meridianlink.com/CLF" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.meridianlink.com/CLF" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="BaseTypes.xsd" />
+  <xs:element name="MORTGAGE_LOAN">
+    <xs:complexType>
+      <xs:complexContent mixed="false">
+        <xs:extension base="MORTGAGE_LOAN" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="MORTGAGE_APPLICANT">
+    <xs:complexContent mixed="false">
+      <xs:extension base="MORTGAGE_BASE_APPLICANT">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="SPOUSE" type="MORTGAGE_BASE_APPLICANT" />
+          <xs:element minOccurs="0" name="CREDIT_REPORT">
+            <xs:annotation>
+              <xs:documentation>
+			  -If credit report data is empty applican'ts credit report won't be imported.
+			  -If credit report's applicant-ssn mismatches the applicant's ssn credit report won't be imported.
+			  -If spouse exists, then this MUST be a joint report. Otherwise, this will be a single applicant credit report.
+			  </xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:simpleContent>
+                <xs:extension base="xs:string">
+                  <xs:attribute name="report_id" type="xs:int" use="required" />
+                  <xs:attribute name="report_format" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:NMTOKEN">
+                        <xs:enumeration value="RAW_XML" />
+                        <xs:enumeration value="MCL_COMMON" />
+                        <xs:enumeration value="MISMO" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="encoding">
+                    <xs:annotation>
+                      <xs:documentation>Default is CDATA encoding.  This will allow clients to easily access data.  However, you cannot nest CDATA -- hence if you use base64, then the credit report will be stored as base64 encoded text on the element.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:NMTOKEN">
+                        <xs:enumeration value="CDATA" />
+                        <xs:enumeration value="INNER_TEXT" />
+                        <xs:enumeration value="BASE64" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PRESENT_HOUSING_EXPENSE">
+            <xs:annotation>
+              <xs:documentation>Combined monthly payments towards current property.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attribute name="monthly_payment">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="other_pi">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="hazard_insurance">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="real_estate_tax">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="mortgage_insurance">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="hoa_due">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="other_expense">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="FOM_ANSWERED_QUESTIONS" type="FOM_ANSWERED_QUESTIONS" />
+        </xs:sequence>
+        <xs:attribute name="is_fraud_credit" type="base_YN" />
+        <xs:attribute name="is_ofac_credit" type="base_YN" />
+        <xs:attribute name="combined_unsecured_aggregate_amount_with_lender" type="base_money" />
+				<xs:attribute name="combined_secured_aggregate_amount_with_lender_no_mortgage" type="base_money" />
+			</xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_BASE_APPLICANT">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_APPLICANT">
+        <xs:sequence>
+          <xs:element name="CURRENT_ADDRESS">
+            <xs:annotation>
+              <xs:documentation>
+								If Applicant's Address is domestic, please use Address Choice of "LOOSE_ADDRESS".
+								And "street_address_2" is currently not supported.
+
+								But if Applicant's address is foreign, then "THREE_LINE_ADDRESS" should be used. In this case,
+								all three attributes "street_address_1", "street_address_2", "street_address_3" are supported.
+							</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:complexContent mixed="false">
+                <xs:extension base="BASE_CURRENT_ADDRESS_CHOICE">
+                  <xs:attributeGroup ref="GROUP_OCCUPANCY_STATUS_DURATION" />
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="PREVIOUS_ADDRESS">
+            <xs:complexType>
+              <xs:complexContent mixed="false">
+                <xs:extension base="BASE_ADDRESS_LOOSE">
+                  <xs:attributeGroup ref="GROUP_OCCUPANCY_STATUS_DURATION" />
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="FINANCIAL_INFO">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="CURRENT_EMPLOYMENT">
+                  <xs:complexType>
+                    <xs:complexContent mixed="false">
+                      <xs:extension base="BASE_EMPLOYMENT">
+                        <xs:attribute name="employee_of_lender_type" type="base_employee_of_lender_types" />
+                        <xs:attribute name="is_employee_of_lender" type="base_YN">
+                          <xs:annotation>
+                            <xs:documentation>This value is readonly from LPQ.  If you want to set it, please use the employee_of_lender_type</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="profession_months" type="xs:integer" />
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="PREVIOUS_EMPLOYMENT">
+                  <xs:complexType>
+                    <xs:complexContent mixed="false">
+                      <xs:extension base="BASE_EMPLOYMENT">
+                        <xs:attribute name="monthly_income">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:decimal">
+                              <xs:totalDigits value="19" />
+                              <xs:fractionDigits value="2" />
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <xs:attribute name="employment_end_date" type="xs:date" />
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="MONTHLY_INCOME">
+                  <xs:complexType>
+                    <xs:complexContent mixed="false">
+                      <xs:extension base="BASE_MONTHLY_INCOME">
+                        <xs:sequence>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="SPECIAL_INCOME">
+                            <xs:complexType>
+                              <xs:attribute name="income_type">
+                                <xs:simpleType>
+                                  <xs:restriction base="xs:NMTOKENS">
+                                    <xs:enumeration value="AlimonyChildSupport" />
+                                    <xs:enumeration value="AutomobileExpenseAccount" />
+                                    <xs:enumeration value="FosterCare" />
+                                    <xs:enumeration value="NotesReceivableInstallment" />
+                                    <xs:enumeration value="Pension" />
+                                    <xs:enumeration value="SocialSecurity" />
+                                    <xs:enumeration value="Trust" />
+                                    <xs:enumeration value="Unemployment" />
+                                    <xs:enumeration value="VABenefitsNonEducational" />
+                                    <xs:enumeration value="MortgageDifferential" />
+                                    <xs:enumeration value="MilitaryBasePay" />
+                                    <xs:enumeration value="MilitaryRationsAllowance" />
+                                    <xs:enumeration value="MilitaryFlightPay" />
+                                    <xs:enumeration value="MilitaryHazardPay" />
+                                    <xs:enumeration value="MilitaryClothesAllowance" />
+                                    <xs:enumeration value="MilitaryQuartersAllowance" />
+                                    <xs:enumeration value="MilitaryPropPay" />
+                                    <xs:enumeration value="MilitaryOverseasPay" />
+                                    <xs:enumeration value="MilitaryCombatPay" />
+                                    <xs:enumeration value="MilitaryVariableHousingAllowance" />
+                                    <xs:enumeration value="SubjectPropertyNetCashFlow" />
+                                  </xs:restriction>
+                                </xs:simpleType>
+                              </xs:attribute>
+                              <xs:attribute name="amount" type="base_money" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="MONTHLY_DEBT" type="BASE_MONTHLY_DEBT" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="2" name="REFERENCE" type="BASE_REFERENCE" />
+          <xs:element name="CONTACT_INFO" type="BASE_CONTACT_INFO" />
+          <xs:element minOccurs="0" name="ASSETS" type="BASE_ASSET_LIST" />
+          <xs:element name="DECLARATION" type="MORTGAGE_DECLARATION" />
+          <xs:element minOccurs="0" name="MAILING_ADDRESS">
+            <xs:annotation>
+              <xs:documentation>
+								If not specified, assumes mailing address = current address.
+								For Mailing Address, both "street_address_1" and "street_address_2" are supported.
+							</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:complexContent mixed="false">
+                <xs:extension base="BASE_ADDRESS_LOOSE">
+                  <xs:attribute default="Y" name="is_current" type="base_YN">
+                    <xs:annotation>
+                      <xs:documentation>If set to Y, then LPQ use values of current address AND any values for this element will be ignored.  Default is Y.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="2" name="ALIAS">
+            <xs:complexType>
+              <xs:attribute name="first_name" type="xs:string" />
+              <xs:attribute name="middle_name" type="xs:string" />
+              <xs:attribute name="last_name" type="xs:string" />
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="school_months" type="xs:integer" />
+        <xs:attribute name="non_mcl_report_id" type="xs:string" />
+        <xs:attribute name="is_VA_HUD_qualified" type="base_YN">
+          <xs:annotation>
+            <xs:documentation>Is  this applicant qualified as a veteran under HUD guidelines and that the loan may be processed as a VA loan.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="interview_method">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="TELEPHONE" />
+              <xs:enumeration value="FACETOFACE" />
+              <xs:enumeration value="INTERNET" />
+              <xs:enumeration value="MAIL" />
+              <xs:enumeration value="FAX" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_INSURANCE">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_INSURANCE">
+        <xs:attribute name="type">
+          <xs:simpleType>
+            <xs:restriction base="xs:NMTOKEN">
+              <xs:enumeration value="CREDIT_LIFE" />
+              <xs:enumeration value="CREDIT_DISABILITY" />
+              <xs:enumeration value="DEBT_CANCELLATION" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_LOAN_INFO">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_LOAN_INFO">
+        <xs:sequence>
+          <xs:element name="PROPOSED_HOUSING_EXPENSE">
+            <xs:complexType>
+              <xs:attribute name="monthly_payment">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="other_pi">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="hazard_insurance">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="real_estate_tax">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="mortgage_insurance">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="hoa_due">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="other_expense">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="19" />
+                    <xs:fractionDigits value="2" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="flood_insurance" type="xs:double" />
+              <xs:attribute name="flood_is_escrow" type="base_YN" />
+              <xs:attribute name="hazard_is_escrow" type="base_YN" />
+              <xs:attribute name="homeowners_insurance" type="xs:double" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="3" name="CURRENT_TRUST_DEED" type="MORTGAGE_CURRENT_TD">
+            <xs:annotation>
+              <xs:documentation>All position must be unique.  Up to 3 current trust deeds are supported.  This is used by HE and ML.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="3" name="NEW_TRUST_DEED" type="MORTGAGE_NEW_TD">
+            <xs:annotation>
+              <xs:documentation>Information regarding 2nd trust deed that will be closed with this loan.  This is applicable for ML only.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="10" name="VESTING">
+            <xs:complexType>
+              <xs:attribute name="vesting_name" type="xs:string" use="required" />
+              <xs:attribute name="vesting_contact_index" type="xs:integer" use="optional" />
+              <xs:attribute name="vesting_marital_status" type="xs:string" use="optional" />
+              <xs:attribute name="vesting_description" type="xs:string" use="optional" />
+              <xs:attribute name="vesting_is_on_app" type="base_YN">
+                <xs:annotation>
+                  <xs:documentation>This is the inverse of Non-Applicant Owner on the UI of Legal Description</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="VESTING_DESCRIPTION" />
+          <xs:element minOccurs="0" name="LEGAL_DESCRIPTION" />
+          <xs:element minOccurs="0" name="HOME_EQUITY_DATA">
+            <xs:complexType>
+              <xs:attribute name="description" type="xs:string" />
+              <xs:attribute name="purpose_name" type="xs:string">
+                <xs:annotation>
+                  <xs:documentation>Home equity prupose.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="home_equity_purpose_id" type="xs:string">
+                <xs:annotation>
+                  <xs:documentation>Internal home equity purpose id.  If specified, will override 'purpose_name'</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="other_reason_name" type="xs:string" />
+              <xs:attribute name="home_equity_other_reason_id" type="xs:string">
+                <xs:annotation>
+                  <xs:documentation>Internal OTHER home equity purpose id.  If specified, will override 'other_reason_name'</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="is_installment" type="base_YN" />
+              <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse" processContents="lax">
+                <xs:annotation>
+                  <xs:documentation>This field is for he_internal_disclosure_codes for internal use only.  LoansPQ will export this value but will not import it.  This internal value is auto generated by LPQ when creating a new loan.  If updating a loan, use the loan_number.</xs:documentation>
+                </xs:annotation>
+              </xs:anyAttribute>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="LOAN_PRODUCT_DATA">
+            <xs:complexType>
+              <xs:attribute name="loan_repayment_type" type="xs:string" />
+              <xs:attribute name="fre_affordable_program_id" type="xs:string" />
+              <xs:attribute name="fre_offering_id" type="xs:string" />
+              <xs:attribute name="arm_rate_first_period_cap" type="base_rate" />
+              <xs:attribute name="arm_rate_subsequent_adjust_months" type="xs:integer" />
+              <xs:attribute name="arm_rate_subsequent_periodic_cap" type="base_rate" />
+              <xs:attribute name="arm_payment_first_adjust_months" type="xs:integer" />
+              <xs:attribute name="arm_payment_subsequent_adjust_months" type="xs:integer" />
+              <xs:attribute name="arm_payment_period_cap" type="base_rate" />
+              <xs:attribute name="arm_rate_first_adjust_months" type="xs:integer" />
+              <xs:attribute name="index_type" type="xs:string" />
+              <xs:attribute name="loan_term_due_months" type="xs:integer" />
+              <xs:attribute name="buydown_source" type="xs:string" />
+              <xs:attribute name="buydown_is_temp" type="base_YN" />
+              <xs:attribute name="buydown_total_months" type="xs:integer" />
+              <xs:attribute name="buydown_first_rate_adjust_percent" type="base_rate" />
+              <xs:attribute name="buydown_change_frequency_months" type="xs:integer" />
+              <xs:attribute name="negative_amortization_limit_percent" type="base_rate" />
+              <xs:attribute name="gse_property_type" type="xs:string" />
+              <xs:attribute name="gse_project_class_type" type="xs:string" />
+              <xs:attribute name="HELOC_max_balance_amount" type="base_money" />
+              <xs:attribute name="max_prepay_penalty" type="base_money" />
+              <xs:attribute name="max_balance_rise" type="base_money" />
+              <xs:attribute name="can_rate_rise" type="base_YN" />
+              <xs:attribute name="can_balance_rise" type="base_YN" />
+              <xs:attribute name="is_prepay_penalty" type="base_YN" />
+              <xs:attribute name="can_payment_rise" type="base_YN" />
+              <xs:attribute name="max_payment_rise" type="base_money" />
+              <xs:attribute name="max_first_payment_rise" type="base_money" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="FREDDIE_MAC" type="MORTGAGE_FREDDIE_MAC" />
+          <xs:element minOccurs="0" name="GOVERNMENT_DATA" type="MORTGAGE_GOVERNMENT_DATA" />
+          <xs:element minOccurs="0" name="GFE">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" name="GFE2015">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip" />
+                    </xs:sequence>
+                    <xs:anyAttribute processContents="skip" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="_compensationtobrokerdescription1" type="xs:string" use="optional" />
+              <xs:attribute name="_compensationtobrokeramount1" type="base_money" use="optional" />
+              <xs:attribute name="_compensationtobrokerdescription2" type="xs:string" use="optional" />
+              <xs:attribute name="_compensationtobrokeramount2" type="base_money" use="optional" />
+              <xs:attribute name="_daysinyear" type="xs:integer" use="optional" />
+              <xs:attribute name="_prepareddate" type="xs:date" use="optional" />
+              <xs:attribute name="_801ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_801percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_801flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_801amount" type="base_money" use="optional" />
+              <xs:attribute name="_801paidby" type="xs:string" />
+              <xs:attribute name="_801ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_801isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_802ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_802percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_802flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_802amount" type="base_money" use="optional" />
+              <xs:attribute name="_802paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_802ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_802isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_803ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_803amount" type="base_money" use="optional" />
+              <xs:attribute name="_803paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_803ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_803isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_804ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_804amount" type="base_money" use="optional" />
+              <xs:attribute name="_804paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_804ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_804isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_805ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_805amount" type="base_money" use="optional" />
+              <xs:attribute name="_805paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_805ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_805isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_808ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_808percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_808flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_808amount" type="base_money" use="optional" />
+              <xs:attribute name="_808paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_808ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_808isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_809ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_809amount" type="base_money" use="optional" />
+              <xs:attribute name="_809paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_809ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_809isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_810ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_810amount" type="base_money" use="optional" />
+              <xs:attribute name="_810paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_810ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_810isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_811ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_811amount" type="base_money" use="optional" />
+              <xs:attribute name="_811paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_811ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_811isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_812ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_812amount" type="base_money" use="optional" />
+              <xs:attribute name="_812paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_812ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_812isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_901numdays" type="xs:string" use="optional" />
+              <xs:attribute name="_901amount" type="base_money" use="optional" />
+              <xs:attribute name="_901paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_901ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_901isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_902amount" type="base_money" use="optional" />
+              <xs:attribute name="_902paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_902ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_902isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_903percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_903percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_903amountpermonth" type="xs:double" use="optional" />
+              <xs:attribute name="_903nummonths" type="xs:string" use="optional" />
+              <xs:attribute name="_903amount" type="base_money" use="optional" />
+              <xs:attribute name="_903paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_903ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_903isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_904description" type="xs:string" use="optional" />
+              <xs:attribute name="_904amount" type="base_money" use="optional" />
+              <xs:attribute name="_904paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_904ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_904isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_905amount" type="base_money" use="optional" />
+              <xs:attribute name="_905paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_905ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_905isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1001nummonths" type="xs:string" use="optional" />
+              <xs:attribute name="_1001amount" type="base_money" use="optional" />
+              <xs:attribute name="_1001paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1001ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1001isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1002percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1002percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1002amountpermonth" type="base_money" use="optional" />
+              <xs:attribute name="_1002nummonths" type="xs:string" use="optional" />
+              <xs:attribute name="_1002amount" type="base_money" use="optional" />
+              <xs:attribute name="_1002paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1002ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1002isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1003nummonths" type="xs:string" use="optional" />
+              <xs:attribute name="_1003amountpermonth" type="base_money" use="optional" />
+              <xs:attribute name="_1003amount" type="base_money" use="optional" />
+              <xs:attribute name="_1003paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1003ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1003isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1004percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1004percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1004amountpermonth" type="base_money" use="optional" />
+              <xs:attribute name="_1004nummonths" type="xs:string" use="optional" />
+              <xs:attribute name="_1004amount" type="base_money" use="optional" />
+              <xs:attribute name="_1004paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1004ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1004isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1005description" type="xs:string" use="optional" />
+              <xs:attribute name="_1005nummonths" type="xs:string" use="optional" />
+              <xs:attribute name="_1005amountpermonth" type="base_money" use="optional" />
+              <xs:attribute name="_1005amount" type="base_money" use="optional" />
+              <xs:attribute name="_1005paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1005ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1005isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1006description" type="xs:string" use="optional" />
+              <xs:attribute name="_1006nummonths" type="xs:string" use="optional" />
+              <xs:attribute name="_1006amountpermonth" type="base_money" use="optional" />
+              <xs:attribute name="_1006amount" type="base_money" use="optional" />
+              <xs:attribute name="_1006paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1006ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1006isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1007description" type="xs:string" use="optional" />
+              <xs:attribute name="_1007nummonths" type="xs:string" use="optional" />
+              <xs:attribute name="_1007amountpermonth" type="base_money" use="optional" />
+              <xs:attribute name="_1007amount" type="base_money" use="optional" />
+              <xs:attribute name="_1007paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1007ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1007isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1008amount" type="base_money" use="optional" />
+              <xs:attribute name="_1008paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1008ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1008isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1101description" type="xs:string" use="optional" />
+              <xs:attribute name="_1101amount" type="base_money" use="optional" />
+              <xs:attribute name="_1101paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1101ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1101isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1101flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1101percentagefee" type="base_money" use="optional" />
+              <xs:attribute name="_1101percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1102description" type="xs:string" use="optional" />
+              <xs:attribute name="_1102amount" type="base_money" use="optional" />
+              <xs:attribute name="_1102paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1102ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1102isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1103description" type="xs:string" use="optional" />
+              <xs:attribute name="_1103amount" type="base_money" use="optional" />
+              <xs:attribute name="_1103paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1103ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1103isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1103flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1103percentagefee" type="base_money" use="optional" />
+              <xs:attribute name="_1103percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1104description" type="xs:string" use="optional" />
+              <xs:attribute name="_1104amount" type="base_money" use="optional" />
+              <xs:attribute name="_1104paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1104ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1104isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1105amount" type="base_money" use="optional" />
+              <xs:attribute name="_1105paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1105ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1105isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1106amount" type="base_money" use="optional" />
+              <xs:attribute name="_1106paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1106ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1106isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1107amount" type="base_money" use="optional" />
+              <xs:attribute name="_1107paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1107ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1107isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1108description" type="xs:string" use="optional" />
+              <xs:attribute name="_1108amount" type="base_money" use="optional" />
+              <xs:attribute name="_1108paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1108ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1108isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1201description" type="xs:string" use="optional" />
+              <xs:attribute name="_1201percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1201percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1201flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1201mortgagefee" type="base_money" use="optional" />
+              <xs:attribute name="_1201releasefee" type="base_money" use="optional" />
+              <xs:attribute name="_1201amount" type="base_money" use="optional" />
+              <xs:attribute name="_1201paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1201ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1201isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1202description" type="xs:string" use="optional" />
+              <xs:attribute name="_1202percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1202percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1202flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1202mortgagefee" type="base_money" use="optional" />
+              <xs:attribute name="_1202amount" type="base_money" use="optional" />
+              <xs:attribute name="_1202paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1202ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1202isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1202description1" type="xs:string" use="optional" />
+              <xs:attribute name="_1202amount1" type="base_money" use="optional" />
+              <xs:attribute name="_1202paidby1" type="xs:string" use="optional" />
+              <xs:attribute name="_1202ispaidtobroker1" type="base_YN" use="optional" />
+              <xs:attribute name="_1202isapr1" type="base_YN" use="optional" />
+              <xs:attribute name="_1202poc1" type="base_YN" use="optional" />
+              <xs:attribute name="_1202ishoepa1" type="base_YN" use="optional" />
+              <xs:attribute name="_1202description2" type="xs:string" use="optional" />
+              <xs:attribute name="_1202amount2" type="base_money" use="optional" />
+              <xs:attribute name="_1202paidby2" type="xs:string" use="optional" />
+              <xs:attribute name="_1202ispaidtobroker2" type="base_YN" use="optional" />
+              <xs:attribute name="_1202isapr2" type="base_YN" use="optional" />
+              <xs:attribute name="_1202poc2" type="base_YN" use="optional" />
+              <xs:attribute name="_1202ishoepa2" type="base_YN" use="optional" />
+              <xs:attribute name="_1203description" type="xs:string" use="optional" />
+              <xs:attribute name="_1203percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1203percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1203flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1203mortgagefee" type="base_money" use="optional" />
+              <xs:attribute name="_1203amount" type="base_money" use="optional" />
+              <xs:attribute name="_1203paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1203ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1203isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1204amount" type="base_money" use="optional" />
+              <xs:attribute name="_1204amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1204paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1204ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1204isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1204poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1204ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1205amount" type="base_money" use="optional" />
+              <xs:attribute name="_1205amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1205paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1205ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1205isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1205poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1205ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1206flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1206amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1206paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1206ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1206isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1206poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1206ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1207flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1207amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1207paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1207ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1207isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1207poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1207ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1302amount" type="base_money" use="optional" />
+              <xs:attribute name="_1302paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1302ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1302isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1302amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1303amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1303paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1303ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1303isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1303poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1303ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1304amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1304paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1304ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1304isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1304poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1304ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1305amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1305paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1305ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1305isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1305poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1305ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_800ispaid1" type="base_YN" use="optional" />
+              <xs:attribute name="_800code1" type="xs:string" use="optional" />
+              <xs:attribute name="_800description1" type="xs:string" use="optional" />
+              <xs:attribute name="_800amount1" type="base_money" use="optional" />
+              <xs:attribute name="_800paidby1" type="xs:string" use="optional" />
+              <xs:attribute name="_800ispaidtobroker1" type="base_YN" use="optional" />
+              <xs:attribute name="_800isapr1" type="base_YN" use="optional" />
+              <xs:attribute name="_800ispaid2" type="base_YN" use="optional" />
+              <xs:attribute name="_800code2" type="xs:string" use="optional" />
+              <xs:attribute name="_800description2" type="xs:string" use="optional" />
+              <xs:attribute name="_800amount2" type="base_money" use="optional" />
+              <xs:attribute name="_800paidby2" type="xs:string" use="optional" />
+              <xs:attribute name="_800ispaidtobroker2" type="base_YN" use="optional" />
+              <xs:attribute name="_800isapr2" type="base_YN" use="optional" />
+              <xs:attribute name="_800ispaid3" type="base_YN" use="optional" />
+              <xs:attribute name="_800code3" type="xs:string" use="optional" />
+              <xs:attribute name="_800description3" type="xs:string" use="optional" />
+              <xs:attribute name="_800amount3" type="base_money" use="optional" />
+              <xs:attribute name="_800paidby3" type="xs:string" use="optional" />
+              <xs:attribute name="_800ispaidtobroker3" type="base_YN" use="optional" />
+              <xs:attribute name="_800isapr3" type="base_YN" use="optional" />
+              <xs:attribute name="_800ispaid4" type="base_YN" use="optional" />
+              <xs:attribute name="_800code4" type="xs:string" use="optional" />
+              <xs:attribute name="_800description4" type="xs:string" use="optional" />
+              <xs:attribute name="_800amount4" type="base_money" use="optional" />
+              <xs:attribute name="_800paidby4" type="xs:string" use="optional" />
+              <xs:attribute name="_800ispaidtobroker4" type="base_YN" use="optional" />
+              <xs:attribute name="_800isapr4" type="base_YN" use="optional" />
+              <xs:attribute name="_800ispaid5" type="base_YN" use="optional" />
+              <xs:attribute name="_800code5" type="xs:string" use="optional" />
+              <xs:attribute name="_800description5" type="xs:string" use="optional" />
+              <xs:attribute name="_800amount5" type="base_money" use="optional" />
+              <xs:attribute name="_800paidby5" type="xs:string" use="optional" />
+              <xs:attribute name="_800ispaidtobroker5" type="base_YN" use="optional" />
+              <xs:attribute name="_800isapr5" type="base_YN" use="optional" />
+              <xs:attribute name="_900code1" type="xs:string" use="optional" />
+              <xs:attribute name="_900description1" type="xs:string" use="optional" />
+              <xs:attribute name="_900amount1" type="base_money" use="optional" />
+              <xs:attribute name="_900paidby1" type="xs:string" use="optional" />
+              <xs:attribute name="_900ispaidtobroker1" type="base_YN" use="optional" />
+              <xs:attribute name="_900isapr1" type="base_YN" use="optional" />
+              <xs:attribute name="_1100code1" type="xs:string" use="optional" />
+              <xs:attribute name="_1100description1" type="xs:string" use="optional" />
+              <xs:attribute name="_1100amount1" type="base_money" use="optional" />
+              <xs:attribute name="_1100paidby1" type="xs:string" use="optional" />
+              <xs:attribute name="_1100ispaidtobroker1" type="base_YN" use="optional" />
+              <xs:attribute name="_1100isapr1" type="base_YN" use="optional" />
+              <xs:attribute name="_1100code2" type="xs:string" use="optional" />
+              <xs:attribute name="_1100description2" type="xs:string" use="optional" />
+              <xs:attribute name="_1100amount2" type="base_money" use="optional" />
+              <xs:attribute name="_1100paidby2" type="xs:string" use="optional" />
+              <xs:attribute name="_1100ispaidtobroker2" type="base_YN" use="optional" />
+              <xs:attribute name="_1100isapr2" type="base_YN" use="optional" />
+              <xs:attribute name="_1100code3" type="xs:string" use="optional" />
+              <xs:attribute name="_1100description3" type="xs:string" use="optional" />
+              <xs:attribute name="_1100amount3" type="base_money" use="optional" />
+              <xs:attribute name="_1100paidby3" type="xs:string" use="optional" />
+              <xs:attribute name="_1100ispaidtobroker3" type="base_YN" use="optional" />
+              <xs:attribute name="_1100isapr3" type="base_YN" use="optional" />
+              <xs:attribute name="_1100code4" type="xs:string" use="optional" />
+              <xs:attribute name="_1100description4" type="xs:string" use="optional" />
+              <xs:attribute name="_1100amount4" type="base_money" use="optional" />
+              <xs:attribute name="_1100paidby4" type="xs:string" use="optional" />
+              <xs:attribute name="_1100ispaidtobroker4" type="base_YN" use="optional" />
+              <xs:attribute name="_1100isapr4" type="base_YN" use="optional" />
+              <xs:attribute name="_1100code5" type="xs:string" use="optional" />
+              <xs:attribute name="_1100description5" type="xs:string" use="optional" />
+              <xs:attribute name="_1100amount5" type="base_money" use="optional" />
+              <xs:attribute name="_1100paidby5" type="xs:string" use="optional" />
+              <xs:attribute name="_1100ispaidtobroker5" type="base_YN" use="optional" />
+              <xs:attribute name="_1100isapr5" type="base_YN" use="optional" />
+              <xs:attribute name="_1100code6" type="xs:string" use="optional" />
+              <xs:attribute name="_1100description6" type="xs:string" use="optional" />
+              <xs:attribute name="_1100amount6" type="base_money" use="optional" />
+              <xs:attribute name="_1100paidby6" type="xs:string" use="optional" />
+              <xs:attribute name="_1100ispaidtobroker6" type="base_YN" use="optional" />
+              <xs:attribute name="_1100isapr6" type="base_YN" use="optional" />
+              <xs:attribute name="_1100code7" type="xs:string" use="optional" />
+              <xs:attribute name="_1100description7" type="xs:string" use="optional" />
+              <xs:attribute name="_1100amount7" type="base_money" use="optional" />
+              <xs:attribute name="_1100paidby7" type="xs:string" use="optional" />
+              <xs:attribute name="_1100ispaidtobroker7" type="base_YN" use="optional" />
+              <xs:attribute name="_1100isapr7" type="base_YN" use="optional" />
+              <xs:attribute name="_1400amount" type="base_money" use="optional" />
+              <xs:attribute name="_1400bamount" type="base_money" use="optional" />
+              <xs:attribute name="_1400camount" type="base_money" use="optional" />
+              <xs:attribute name="_1300code1" type="xs:string" use="optional" />
+              <xs:attribute name="_1300description1" type="xs:string" use="optional" />
+              <xs:attribute name="_1300amount1" type="base_money" use="optional" />
+              <xs:attribute name="_1300paidby1" type="xs:string" use="optional" />
+              <xs:attribute name="_1300ispaidtobroker1" type="base_YN" use="optional" />
+              <xs:attribute name="_1300isapr1" type="base_YN" use="optional" />
+              <xs:attribute name="_1300code2" type="xs:string" use="optional" />
+              <xs:attribute name="_1300description2" type="xs:string" use="optional" />
+              <xs:attribute name="_1300amount2" type="base_money" use="optional" />
+              <xs:attribute name="_1300paidby2" type="xs:string" use="optional" />
+              <xs:attribute name="_1300ispaidtobroker2" type="base_YN" use="optional" />
+              <xs:attribute name="_1300isapr2" type="base_YN" use="optional" />
+              <xs:attribute name="_1300code3" type="xs:string" use="optional" />
+              <xs:attribute name="_1300description3" type="xs:string" use="optional" />
+              <xs:attribute name="_1300amount3" type="base_money" use="optional" />
+              <xs:attribute name="_1300paidby3" type="xs:string" use="optional" />
+              <xs:attribute name="_1300ispaidtobroker3" type="base_YN" use="optional" />
+              <xs:attribute name="_1300isapr3" type="base_YN" use="optional" />
+              <xs:attribute name="_1300code4" type="xs:string" use="optional" />
+              <xs:attribute name="_1300description4" type="xs:string" use="optional" />
+              <xs:attribute name="_1300amount4" type="base_money" use="optional" />
+              <xs:attribute name="_1300paidby4" type="xs:string" use="optional" />
+              <xs:attribute name="_1300ispaidtobroker4" type="base_YN" use="optional" />
+              <xs:attribute name="_1300isapr4" type="base_YN" use="optional" />
+              <xs:attribute name="_1300code5" type="xs:string" use="optional" />
+              <xs:attribute name="_1300description5" type="xs:string" use="optional" />
+              <xs:attribute name="_1300amount5" type="base_money" use="optional" />
+              <xs:attribute name="_1300paidby5" type="xs:string" use="optional" />
+              <xs:attribute name="_1300ispaidtobroker5" type="base_YN" use="optional" />
+              <xs:attribute name="_1300isapr5" type="base_YN" use="optional" />
+              <xs:attribute name="_1200code1" type="xs:string" use="optional" />
+              <xs:attribute name="_1200description1" type="xs:string" use="optional" />
+              <xs:attribute name="_1200amount1" type="base_money" use="optional" />
+              <xs:attribute name="_1200paidby1" type="xs:string" use="optional" />
+              <xs:attribute name="_1200ispaidtobroker1" type="base_YN" use="optional" />
+              <xs:attribute name="_1200isapr1" type="base_YN" use="optional" />
+              <xs:attribute name="_1200percentagefee1" type="base_rate" use="optional" />
+              <xs:attribute name="_1200percentageof1" type="xs:string" use="optional" />
+              <xs:attribute name="_1200flatfee1" type="base_money" use="optional" />
+              <xs:attribute name="_1200code2" type="xs:string" use="optional" />
+              <xs:attribute name="_1200description2" type="xs:string" use="optional" />
+              <xs:attribute name="_1200amount2" type="base_money" use="optional" />
+              <xs:attribute name="_1200paidby2" type="xs:string" use="optional" />
+              <xs:attribute name="_1200ispaidtobroker2" type="base_YN" use="optional" />
+              <xs:attribute name="_1200isapr2" type="base_YN" use="optional" />
+              <xs:attribute name="_1200percentagefee2" type="base_rate" use="optional" />
+              <xs:attribute name="_1200percentageof2" type="xs:string" use="optional" />
+              <xs:attribute name="_1200flatfee2" type="base_money" use="optional" />
+              <xs:attribute name="_1200code3" type="xs:string" use="optional" />
+              <xs:attribute name="_1200description3" type="xs:string" use="optional" />
+              <xs:attribute name="_1200amount3" type="base_money" use="optional" />
+              <xs:attribute name="_1200paidby3" type="xs:string" use="optional" />
+              <xs:attribute name="_1200ispaidtobroker3" type="base_YN" use="optional" />
+              <xs:attribute name="_1200isapr3" type="base_YN" use="optional" />
+              <xs:attribute name="_1200percentagefee3" type="base_rate" use="optional" />
+              <xs:attribute name="_1200percentageof3" type="xs:string" use="optional" />
+              <xs:attribute name="_1200flatfee3" type="base_money" use="optional" />
+              <xs:attribute name="_801poc" type="base_YN" use="optional" />
+              <xs:attribute name="_802poc" type="base_YN" use="optional" />
+              <xs:attribute name="_803poc" type="base_YN" use="optional" />
+              <xs:attribute name="_804poc" type="base_YN" use="optional" />
+              <xs:attribute name="_805poc" type="base_YN" use="optional" />
+              <xs:attribute name="_808poc" type="base_YN" use="optional" />
+              <xs:attribute name="_809poc" type="base_YN" use="optional" />
+              <xs:attribute name="_810poc" type="base_YN" use="optional" />
+              <xs:attribute name="_811poc" type="base_YN" use="optional" />
+              <xs:attribute name="_812poc" type="base_YN" use="optional" />
+              <xs:attribute name="_800poc1" type="base_YN" use="optional" />
+              <xs:attribute name="_800poc2" type="base_YN" use="optional" />
+              <xs:attribute name="_800poc3" type="base_YN" use="optional" />
+              <xs:attribute name="_800poc4" type="base_YN" use="optional" />
+              <xs:attribute name="_800poc5" type="base_YN" use="optional" />
+              <xs:attribute name="_901poc" type="base_YN" use="optional" />
+              <xs:attribute name="_902poc" type="base_YN" use="optional" />
+              <xs:attribute name="_903poc" type="base_YN" use="optional" />
+              <xs:attribute name="_904poc" type="base_YN" use="optional" />
+              <xs:attribute name="_905poc" type="base_YN" use="optional" />
+              <xs:attribute name="_900poc1" type="base_YN" use="optional" />
+              <xs:attribute name="_1001poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1002poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1003poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1004poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1005poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1006poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1007poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1008poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1101poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1102poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1103poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1104poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1105poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1106poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1107poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1108poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1100poc1" type="base_YN" use="optional" />
+              <xs:attribute name="_1100poc2" type="base_YN" use="optional" />
+              <xs:attribute name="_1100poc3" type="base_YN" use="optional" />
+              <xs:attribute name="_1100poc4" type="base_YN" use="optional" />
+              <xs:attribute name="_1100poc5" type="base_YN" use="optional" />
+              <xs:attribute name="_1100poc6" type="base_YN" use="optional" />
+              <xs:attribute name="_1100poc7" type="base_YN" use="optional" />
+              <xs:attribute name="_1201poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1202poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1203poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1200poc1" type="base_YN" use="optional" />
+              <xs:attribute name="_1200poc2" type="base_YN" use="optional" />
+              <xs:attribute name="_1200poc3" type="base_YN" use="optional" />
+              <xs:attribute name="_1302poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1300poc1" type="base_YN" use="optional" />
+              <xs:attribute name="_1300poc2" type="base_YN" use="optional" />
+              <xs:attribute name="_1300poc3" type="base_YN" use="optional" />
+              <xs:attribute name="_1300poc4" type="base_YN" use="optional" />
+              <xs:attribute name="_1300poc5" type="base_YN" use="optional" />
+              <xs:attribute name="_801ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_802ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_803ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_804ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_805ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_808ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_809ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_810ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_811ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_812ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_901ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_902ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_903ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_904ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_905ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1001ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1002ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1003ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1004ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1005ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1006ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1007ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1008ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1101ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1102ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1103ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1104ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1105ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1106ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1107ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1108ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1201ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1202ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1203ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1302ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_800ishoepa1" type="base_YN" use="optional" />
+              <xs:attribute name="_800ishoepa2" type="base_YN" use="optional" />
+              <xs:attribute name="_800ishoepa3" type="base_YN" use="optional" />
+              <xs:attribute name="_800ishoepa4" type="base_YN" use="optional" />
+              <xs:attribute name="_800ishoepa5" type="base_YN" use="optional" />
+              <xs:attribute name="_900ishoepa1" type="base_YN" use="optional" />
+              <xs:attribute name="_1100ishoepa1" type="base_YN" use="optional" />
+              <xs:attribute name="_1100ishoepa2" type="base_YN" use="optional" />
+              <xs:attribute name="_1100ishoepa3" type="base_YN" use="optional" />
+              <xs:attribute name="_1100ishoepa4" type="base_YN" use="optional" />
+              <xs:attribute name="_1100ishoepa5" type="base_YN" use="optional" />
+              <xs:attribute name="_1100ishoepa6" type="base_YN" use="optional" />
+              <xs:attribute name="_1100ishoepa7" type="base_YN" use="optional" />
+              <xs:attribute name="_1200ishoepa1" type="base_YN" use="optional" />
+              <xs:attribute name="_1200ishoepa2" type="base_YN" use="optional" />
+              <xs:attribute name="_1200ishoepa3" type="base_YN" use="optional" />
+              <xs:attribute name="_1300ishoepa1" type="base_YN" use="optional" />
+              <xs:attribute name="_1300ishoepa2" type="base_YN" use="optional" />
+              <xs:attribute name="_1300ishoepa3" type="base_YN" use="optional" />
+              <xs:attribute name="_1300ishoepa4" type="base_YN" use="optional" />
+              <xs:attribute name="_1300ishoepa5" type="base_YN" use="optional" />
+              <xs:attribute name="_gfeversion" type="xs:string" use="optional" />
+              <xs:attribute name="_gfelocked" type="xs:string" use="optional" />
+              <xs:attribute name="_gfe2015" type="xs:string" use="optional" />
+              <xs:attribute name="_daysrequireratelock" type="xs:integer" use="optional" />
+              <xs:attribute name="_estimateavailabilityenddate" type="xs:date" use="optional" />
+              <xs:attribute name="_rateavailabilityenddate" type="xs:date" use="optional" />
+              <xs:attribute name="_mtginsuranceamtthisloan" type="xs:string" use="optional" />
+              <xs:attribute name="_estimateavailabilityendtime" type="xs:time" use="optional" />
+              <xs:attribute name="_rateavailabilityendtime" type="xs:time" use="optional" />
+              <xs:attribute name="_801amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_802amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_803amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_804amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_805amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_805description" type="xs:string" use="optional" />
+              <xs:attribute name="_806description" type="xs:string" use="optional" />
+              <xs:attribute name="_807description" type="xs:string" use="optional" />
+              <xs:attribute name="_808description" type="xs:string" use="optional" />
+              <xs:attribute name="_809description" type="xs:string" use="optional" />
+              <xs:attribute name="_902description" type="xs:string" use="optional" />
+              <xs:attribute name="_810description" type="xs:string" use="optional" />
+              <xs:attribute name="_804description" type="xs:string" use="optional" />
+              <xs:attribute name="_811amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_905description" type="xs:string" use="optional" />
+              <xs:attribute name="_903description" type="xs:string" use="optional" />
+              <xs:attribute name="_806amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_807amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_808amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_809amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_807amount" type="base_money" use="optional" />
+              <xs:attribute name="_806amount" type="base_money" use="optional" />
+              <xs:attribute name="_800amount5locked" type="base_money" use="optional" />
+              <xs:attribute name="_800amount4locked" type="base_money" use="optional" />
+              <xs:attribute name="_800amount3locked" type="base_money" use="optional" />
+              <xs:attribute name="_800amount2locked" type="base_money" use="optional" />
+              <xs:attribute name="_800amount1locked" type="base_money" use="optional" />
+              <xs:attribute name="_806isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_905amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_904amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_903amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_902amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_900amount1locked" type="base_money" use="optional" />
+              <xs:attribute name="_812amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_810amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_806ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_806poc" type="base_YN" use="optional" />
+              <xs:attribute name="_806ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_807isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_806ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_807poc" type="base_YN" use="optional" />
+              <xs:attribute name="_807ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_807ispaid" type="base_YN" use="optional" />
+              <xs:attribute name="_807ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_807paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_806paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1109description" type="xs:string" use="optional" />
+              <xs:attribute name="_1110description" type="xs:string" use="optional" />
+              <xs:attribute name="_1111description" type="xs:string" use="optional" />
+              <xs:attribute name="_1206description" type="xs:string" use="optional" />
+              <xs:attribute name="_1302description" type="xs:string" use="optional" />
+              <xs:attribute name="_1303description" type="xs:string" use="optional" />
+              <xs:attribute name="_1305description" type="xs:string" use="optional" />
+              <xs:attribute name="_1304description" type="xs:string" use="optional" />
+              <xs:attribute name="_1207description" type="xs:string" use="optional" />
+              <xs:attribute name="_1001amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1100amount7locked" type="base_money" use="optional" />
+              <xs:attribute name="_1104amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1111amount" type="base_money" use="optional" />
+              <xs:attribute name="_1203amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1204flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1205mortgagefee" type="base_money" use="optional" />
+              <xs:attribute name="_1205flatfee" type="base_money" use="optional" />
+              <xs:attribute name="_1206amount" type="base_money" use="optional" />
+              <xs:attribute name="_1207amount" type="base_money" use="optional" />
+              <xs:attribute name="_1300amount1locked" type="base_money" use="optional" />
+              <xs:attribute name="_1300amount2locked" type="base_money" use="optional" />
+              <xs:attribute name="_1300amount3locked" type="base_money" use="optional" />
+              <xs:attribute name="_1300amount4locked" type="base_money" use="optional" />
+              <xs:attribute name="_1300amount5locked" type="base_money" use="optional" />
+              <xs:attribute name="_1202releasefee" type="base_money" use="optional" />
+              <xs:attribute name="_1201amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1111amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1110amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1110amount" type="base_money" use="optional" />
+              <xs:attribute name="_1109amount" type="base_money" use="optional" />
+              <xs:attribute name="_1109amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1103amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1102amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1101amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1100amount6locked" type="base_money" use="optional" />
+              <xs:attribute name="_1100amount5locked" type="base_money" use="optional" />
+              <xs:attribute name="_1100amount4locked" type="base_money" use="optional" />
+              <xs:attribute name="_1100amount3locked" type="base_money" use="optional" />
+              <xs:attribute name="_1100amount2locked" type="base_money" use="optional" />
+              <xs:attribute name="_1100amount1locked" type="base_money" use="optional" />
+              <xs:attribute name="_1601amount" type="base_money" use="optional" />
+              <xs:attribute name="_1305amount" type="base_money" use="optional" />
+              <xs:attribute name="_1304amount" type="base_money" use="optional" />
+              <xs:attribute name="_1303amount" type="base_money" use="optional" />
+              <xs:attribute name="_1301amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1301amount" type="base_money" use="optional" />
+              <xs:attribute name="_1301paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1111paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1110paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1109paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_1301poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1301ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1301ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1301isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1111poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1111ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1111ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1111isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1110poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1110ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1110ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1110isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_1109poc" type="base_YN" use="optional" />
+              <xs:attribute name="_1109ispaidtobroker" type="base_YN" use="optional" />
+              <xs:attribute name="_1109ishoepa" type="base_YN" use="optional" />
+              <xs:attribute name="_1109isapr" type="base_YN" use="optional" />
+              <xs:attribute name="_811description" type="xs:string" use="optional" />
+              <xs:attribute name="_812description" type="xs:string" use="optional" />
+              <xs:attribute name="_901amountlocked" type="base_money" use="optional" />
+              <xs:attribute name="_1204mortgagefee" type="base_money" use="optional" />
+              <xs:attribute name="_1204deedpercentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1205deedpercentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1204deedpercentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1205deedpercentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1204mortgagepercentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1205mortgagepercentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1204mortgagepercentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1205mortgagepercentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1206percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1207percentagefee" type="base_rate" use="optional" />
+              <xs:attribute name="_1206percentageof" type="xs:string" use="optional" />
+              <xs:attribute name="_1207percentageof" type="xs:string" use="optional" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="SETTLEMENT_STATEMENTS">
+            <xs:complexType>
+              <xs:attribute name="_101amount" type="base_money" use="optional" />
+              <xs:attribute name="_102amount" type="base_money" use="optional" />
+              <xs:attribute name="_103amount" type="base_money" use="optional" />
+              <xs:attribute name="_104description" type="xs:string" use="optional" />
+              <xs:attribute name="_104amount" type="base_money" use="optional" />
+              <xs:attribute name="_105description" type="xs:string" use="optional" />
+              <xs:attribute name="_105amount" type="base_money" use="optional" />
+              <xs:attribute name="_106datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_106dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_106amount" type="base_money" use="optional" />
+              <xs:attribute name="_107datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_107dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_107amount" type="base_money" use="optional" />
+              <xs:attribute name="_108datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_108dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_108amount" type="base_money" use="optional" />
+              <xs:attribute name="_100code1" type="xs:string" use="optional" />
+              <xs:attribute name="_100code2" type="xs:string" use="optional" />
+              <xs:attribute name="_100code3" type="xs:string" use="optional" />
+              <xs:attribute name="_100code4" type="xs:string" use="optional" />
+              <xs:attribute name="_100description1" type="xs:string" use="optional" />
+              <xs:attribute name="_100description2" type="xs:string" use="optional" />
+              <xs:attribute name="_100description3" type="xs:string" use="optional" />
+              <xs:attribute name="_100description4" type="xs:string" use="optional" />
+              <xs:attribute name="_100amount1" type="base_money" use="optional" />
+              <xs:attribute name="_100amount2" type="base_money" use="optional" />
+              <xs:attribute name="_100amount3" type="base_money" use="optional" />
+              <xs:attribute name="_100amount4" type="base_money" use="optional" />
+              <xs:attribute name="_120amount" type="base_money" use="optional" />
+              <xs:attribute name="_201amount" type="base_money" use="optional" />
+              <xs:attribute name="_202amount" type="base_money" use="optional" />
+              <xs:attribute name="_203amount" type="base_money" use="optional" />
+              <xs:attribute name="_204description" type="xs:string" use="optional" />
+              <xs:attribute name="_204amount" type="base_money" use="optional" />
+              <xs:attribute name="_205description" type="xs:string" use="optional" />
+              <xs:attribute name="_205amount" type="base_money" use="optional" />
+              <xs:attribute name="_206description" type="xs:string" use="optional" />
+              <xs:attribute name="_206amount" type="base_money" use="optional" />
+              <xs:attribute name="_207description" type="xs:string" use="optional" />
+              <xs:attribute name="_207amount" type="base_money" use="optional" />
+              <xs:attribute name="_208description" type="xs:string" use="optional" />
+              <xs:attribute name="_208amount" type="base_money" use="optional" />
+              <xs:attribute name="_209description" type="xs:string" use="optional" />
+              <xs:attribute name="_209amount" type="base_money" use="optional" />
+              <xs:attribute name="_210datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_210dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_210amount" type="base_money" use="optional" />
+              <xs:attribute name="_211datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_211dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_211amount" type="base_money" use="optional" />
+              <xs:attribute name="_212datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_212dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_212amount" type="base_money" use="optional" />
+              <xs:attribute name="_213description" type="xs:string" use="optional" />
+              <xs:attribute name="_213amount" type="base_money" use="optional" />
+              <xs:attribute name="_214description" type="xs:string" use="optional" />
+              <xs:attribute name="_214amount" type="base_money" use="optional" />
+              <xs:attribute name="_215description" type="xs:string" use="optional" />
+              <xs:attribute name="_215amount" type="base_money" use="optional" />
+              <xs:attribute name="_216description" type="xs:string" use="optional" />
+              <xs:attribute name="_216amount" type="base_money" use="optional" />
+              <xs:attribute name="_217description" type="xs:string" use="optional" />
+              <xs:attribute name="_217amount" type="base_money" use="optional" />
+              <xs:attribute name="_218description" type="xs:string" use="optional" />
+              <xs:attribute name="_218amount" type="base_money" use="optional" />
+              <xs:attribute name="_219description" type="xs:string" use="optional" />
+              <xs:attribute name="_219amount" type="base_money" use="optional" />
+              <xs:attribute name="_220amount" type="base_money" use="optional" />
+              <xs:attribute name="_301amount" type="base_money" use="optional" />
+              <xs:attribute name="_302amount" type="base_money" use="optional" />
+              <xs:attribute name="_303isfromborrower" type="xs:string" use="optional" />
+              <xs:attribute name="_303istoborrower" type="xs:string" use="optional" />
+              <xs:attribute name="_303amount" type="base_money" use="optional" />
+              <xs:attribute name="_401amount" type="base_money" use="optional" />
+              <xs:attribute name="_402amount" type="base_money" use="optional" />
+              <xs:attribute name="_403description" type="xs:string" use="optional" />
+              <xs:attribute name="_403amount" type="base_money" use="optional" />
+              <xs:attribute name="_404description" type="xs:string" use="optional" />
+              <xs:attribute name="_404amount" type="base_money" use="optional" />
+              <xs:attribute name="_405description" type="xs:string" use="optional" />
+              <xs:attribute name="_405amount" type="base_money" use="optional" />
+              <xs:attribute name="_406datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_406dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_406amount" type="base_money" use="optional" />
+              <xs:attribute name="_407datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_407dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_407amount" type="base_money" use="optional" />
+              <xs:attribute name="_408datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_408dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_408amount" type="base_money" use="optional" />
+              <xs:attribute name="_400code1" type="xs:string" use="optional" />
+              <xs:attribute name="_400code2" type="xs:string" use="optional" />
+              <xs:attribute name="_400code3" type="xs:string" use="optional" />
+              <xs:attribute name="_400code4" type="xs:string" use="optional" />
+              <xs:attribute name="_400description1" type="xs:string" use="optional" />
+              <xs:attribute name="_400description2" type="xs:string" use="optional" />
+              <xs:attribute name="_400description3" type="xs:string" use="optional" />
+              <xs:attribute name="_400description4" type="xs:string" use="optional" />
+              <xs:attribute name="_400amount1" type="base_money" use="optional" />
+              <xs:attribute name="_400amount2" type="base_money" use="optional" />
+              <xs:attribute name="_400amount3" type="base_money" use="optional" />
+              <xs:attribute name="_400amount4" type="base_money" use="optional" />
+              <xs:attribute name="_420amount" type="base_money" use="optional" />
+              <xs:attribute name="_501amount" type="base_money" use="optional" />
+              <xs:attribute name="_502amount" type="base_money" use="optional" />
+              <xs:attribute name="_503amount" type="base_money" use="optional" />
+              <xs:attribute name="_504amount" type="base_money" use="optional" />
+              <xs:attribute name="_505amount" type="base_money" use="optional" />
+              <xs:attribute name="_506description" type="xs:string" use="optional" />
+              <xs:attribute name="_506amount" type="base_money" use="optional" />
+              <xs:attribute name="_507description" type="xs:string" use="optional" />
+              <xs:attribute name="_507amount" type="base_money" use="optional" />
+              <xs:attribute name="_508description" type="xs:string" use="optional" />
+              <xs:attribute name="_508amount" type="base_money" use="optional" />
+              <xs:attribute name="_509description" type="xs:string" use="optional" />
+              <xs:attribute name="_509amount" type="base_money" use="optional" />
+              <xs:attribute name="_510datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_510dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_510amount" type="base_money" use="optional" />
+              <xs:attribute name="_511datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_511dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_511amount" type="base_money" use="optional" />
+              <xs:attribute name="_512datefrom" type="xs:date" use="optional" />
+              <xs:attribute name="_512dateto" type="xs:date" use="optional" />
+              <xs:attribute name="_512amount" type="base_money" use="optional" />
+              <xs:attribute name="_513description" type="xs:string" use="optional" />
+              <xs:attribute name="_513amount" type="base_money" use="optional" />
+              <xs:attribute name="_514description" type="xs:string" use="optional" />
+              <xs:attribute name="_514amount" type="base_money" use="optional" />
+              <xs:attribute name="_515description" type="xs:string" use="optional" />
+              <xs:attribute name="_515amount" type="base_money" use="optional" />
+              <xs:attribute name="_516description" type="xs:string" use="optional" />
+              <xs:attribute name="_516amount" type="base_money" use="optional" />
+              <xs:attribute name="_517description" type="xs:string" use="optional" />
+              <xs:attribute name="_517amount" type="base_money" use="optional" />
+              <xs:attribute name="_518description" type="xs:string" use="optional" />
+              <xs:attribute name="_518amount" type="base_money" use="optional" />
+              <xs:attribute name="_519description" type="xs:string" use="optional" />
+              <xs:attribute name="_519amount" type="base_money" use="optional" />
+              <xs:attribute name="_520amount" type="base_money" use="optional" />
+              <xs:attribute name="_601amount" type="base_money" use="optional" />
+              <xs:attribute name="_602amount" type="base_money" use="optional" />
+              <xs:attribute name="_603istoseller" type="xs:string" use="optional" />
+              <xs:attribute name="_603isfromseller" type="xs:string" use="optional" />
+              <xs:attribute name="_603amount" type="base_money" use="optional" />
+              <xs:attribute name="_700fee" type="base_money" use="optional" />
+              <xs:attribute name="_700percentage" type="xs:string" use="optional" />
+              <xs:attribute name="_700amount" type="base_money" use="optional" />
+              <xs:attribute name="_701description" type="xs:string" use="optional" />
+              <xs:attribute name="_701amount" type="base_money" use="optional" />
+              <xs:attribute name="_702description" type="xs:string" use="optional" />
+              <xs:attribute name="_702amount" type="base_money" use="optional" />
+              <xs:attribute name="_703amount" type="base_money" use="optional" />
+              <xs:attribute name="_703paidby" type="xs:string" use="optional" />
+              <xs:attribute name="_700code1" type="xs:string" use="optional" />
+              <xs:attribute name="_700description1" type="xs:string" use="optional" />
+              <xs:attribute name="_700amount1" type="base_money" use="optional" />
+              <xs:attribute name="_700paidby1" type="xs:string" use="optional" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="GFE_AGGREGATE_ADJUSTMENT_INFOS">
+            <xs:complexType>
+              <xs:attribute name="hazard_cushion" type="xs:int" use="optional" />
+              <xs:attribute name="hazard_date1" type="xs:date" use="optional" />
+              <xs:attribute name="hazard_date2" type="xs:date" use="optional" />
+              <xs:attribute name="hazard_date3" type="xs:date" use="optional" />
+              <xs:attribute name="hazard_date4" type="xs:date" use="optional" />
+              <xs:attribute name="mortgage_cushion" type="xs:int" use="optional" />
+              <xs:attribute name="mortgage_date1" type="xs:date" use="optional" />
+              <xs:attribute name="mortgage_date2" type="xs:date" use="optional" />
+              <xs:attribute name="mortgage_date3" type="xs:date" use="optional" />
+              <xs:attribute name="mortgage_date4" type="xs:date" use="optional" />
+              <xs:attribute name="property_cushion" type="xs:int" use="optional" />
+              <xs:attribute name="property_date1" type="xs:date" use="optional" />
+              <xs:attribute name="property_date2" type="xs:date" use="optional" />
+              <xs:attribute name="property_date3" type="xs:date" use="optional" />
+              <xs:attribute name="property_date4" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined1_cushion" type="xs:int" use="optional" />
+              <xs:attribute name="userdefined1_date1" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined1_date2" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined1_date3" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined1_date4" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined2_cushion" type="xs:int" use="optional" />
+              <xs:attribute name="userdefined2_date1" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined2_date2" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined2_date3" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined2_date4" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined3_cushion" type="xs:int" use="optional" />
+              <xs:attribute name="userdefined3_date1" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined3_date2" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined3_date3" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined3_date4" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined4_cushion" type="xs:int" use="optional" />
+              <xs:attribute name="userdefined4_date1" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined4_date2" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined4_date3" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined4_date4" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined5_cushion" type="xs:int" use="optional" />
+              <xs:attribute name="userdefined5_date1" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined5_date2" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined5_date3" type="xs:date" use="optional" />
+              <xs:attribute name="userdefined5_date4" type="xs:date" use="optional" />
+              <xs:attribute name="hazard_annual_amount" type="base_money" use="optional" />
+              <xs:attribute name="mortgage_annual_amount" type="base_money" use="optional" />
+              <xs:attribute name="property_annual_amount" type="base_money" use="optional" />
+              <xs:attribute name="userdefined1_annual_amount" type="base_money" use="optional" />
+              <xs:attribute name="userdefined2_annual_amount" type="base_money" use="optional" />
+              <xs:attribute name="userdefined3_annual_amount" type="base_money" use="optional" />
+              <xs:attribute name="userdefined4_annual_amount" type="base_money" use="optional" />
+              <xs:attribute name="userdefined5_annual_amount" type="base_money" use="optional" />
+              <xs:attribute name="hazard_is_monthly" type="base_YN" use="optional" />
+              <xs:attribute name="mortgage_is_monthly" type="base_YN" use="optional" />
+              <xs:attribute name="property_is_monthly" type="base_YN" use="optional" />
+              <xs:attribute name="userdefined1_is_monthly" type="base_YN" use="optional" />
+              <xs:attribute name="userdefined2_is_monthly" type="base_YN" use="optional" />
+              <xs:attribute name="userdefined3_is_monthly" type="base_YN" use="optional" />
+              <xs:attribute name="userdefined4_is_monthly" type="base_YN" use="optional" />
+              <xs:attribute name="userdefined5_is_monthly" type="base_YN" use="optional" />
+              <xs:attribute name="hazard_disbursement_amount1" type="base_money" use="optional" />
+              <xs:attribute name="hazard_disbursement_amount2" type="base_money" use="optional" />
+              <xs:attribute name="hazard_disbursement_amount3" type="base_money" use="optional" />
+              <xs:attribute name="hazard_disbursement_amount4" type="base_money" use="optional" />
+              <xs:attribute name="mortgage_disbursement_amount1" type="base_money" use="optional" />
+              <xs:attribute name="mortgage_disbursement_amount2" type="base_money" use="optional" />
+              <xs:attribute name="mortgage_disbursement_amount3" type="base_money" use="optional" />
+              <xs:attribute name="mortgage_disbursement_amount4" type="base_money" use="optional" />
+              <xs:attribute name="property_disbursement_amount1" type="base_money" use="optional" />
+              <xs:attribute name="property_disbursement_amount2" type="base_money" use="optional" />
+              <xs:attribute name="property_disbursement_amount3" type="base_money" use="optional" />
+              <xs:attribute name="property_disbursement_amount4" type="base_money" use="optional" />
+              <xs:attribute name="userdefined1_disbursement_amount1" type="base_money" use="optional" />
+              <xs:attribute name="userdefined1_disbursement_amount2" type="base_money" use="optional" />
+              <xs:attribute name="userdefined1_disbursement_amount3" type="base_money" use="optional" />
+              <xs:attribute name="userdefined1_disbursement_amount4" type="base_money" use="optional" />
+              <xs:attribute name="userdefined2_disbursement_amount1" type="base_money" use="optional" />
+              <xs:attribute name="userdefined2_disbursement_amount2" type="base_money" use="optional" />
+              <xs:attribute name="userdefined2_disbursement_amount3" type="base_money" use="optional" />
+              <xs:attribute name="userdefined2_disbursement_amount4" type="base_money" use="optional" />
+              <xs:attribute name="userdefined3_disbursement_amount1" type="base_money" use="optional" />
+              <xs:attribute name="userdefined3_disbursement_amount2" type="base_money" use="optional" />
+              <xs:attribute name="userdefined3_disbursement_amount3" type="base_money" use="optional" />
+              <xs:attribute name="userdefined3_disbursement_amount4" type="base_money" use="optional" />
+              <xs:attribute name="userdefined4_disbursement_amount1" type="base_money" use="optional" />
+              <xs:attribute name="userdefined4_disbursement_amount2" type="base_money" use="optional" />
+              <xs:attribute name="userdefined4_disbursement_amount3" type="base_money" use="optional" />
+              <xs:attribute name="userdefined4_disbursement_amount4" type="base_money" use="optional" />
+              <xs:attribute name="userdefined5_disbursement_amount1" type="base_money" use="optional" />
+              <xs:attribute name="userdefined5_disbursement_amount2" type="base_money" use="optional" />
+              <xs:attribute name="userdefined5_disbursement_amount3" type="base_money" use="optional" />
+              <xs:attribute name="userdefined5_disbursement_amount4" type="base_money" use="optional" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="HELOC_CARD_HOLDERS" type="HOME_EQUITY_HELOC_CARDS" />
+        </xs:sequence>
+        <xs:attribute name="mortgage_loan_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="CONV" />
+              <xs:enumeration value="FHA" />
+              <xs:enumeration value="VA" />
+              <xs:enumeration value="USDA" />
+              <xs:enumeration value="OTHER" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="mortgage_loan_type_other_desc" type="xs:string" />
+        <xs:attribute name="is_home_equity" type="base_YN" />
+        <xs:attribute name="is_lot_loan" type="base_YN" />
+        <xs:attribute name="lot_purpose">
+          <xs:annotation>
+            <xs:documentation>Only applicable if is_lot_loan=Y.  </xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="" />
+              <xs:enumeration value="IMPROVE_OWNER_USE" />
+              <xs:enumeration value="IMPROVE_INVEST" />
+              <xs:enumeration value="UNIMPROVE_REC" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="purpose">
+          <xs:annotation>
+            <xs:documentation>Only applicable if non-equity application.  For HE, refer to HOME_EQUITY_DATA:purpose_name</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="CONSTRUCTION" />
+              <xs:enumeration value="CONSTRUCTION-PERM" />
+              <xs:enumeration value="PURCHASE" />
+              <xs:enumeration value="REFINANCE" />
+              <xs:enumeration value="REFINANCE CASHOUT" />
+              <xs:enumeration value="OTHER" />
+              <xs:enumeration value="HOME IMPROVEMENT" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="refinance_purpose">
+          <xs:annotation>
+            <xs:documentation>
+							This attribute maps to logical "reason" field on app.  It serves a dual purpose.  For non-home equity loans, please use the refinance_purpose_first values; for home equities, please use the homeequity_refinance_purpose values.  Text is provided below only for clarification of what is shown on UI, but actual xml should use "value".
+							<refinance_purpose_first>
+								<!-- fnma -->
+								<item text="CASHOUT/DEBT CONSOLIDATION" value="CASHOUT/CONSOLIDATE" />
+								<item text="CASHOUT/HOME IMPROVEMENT" value="CASHOUT/HOME IMPROV" />
+								<item text="CASHOUT/LIMITED" value="CASHOUT/LIMITED" />
+								<item text="CASHOUT/OTHER" value="CASHOUT/OTHER" />
+								<!-- fnma + mismo -->
+								<item text="NO-CASHOUT/FHA STREAMLINED REFI" value="NC FHA STREAMLINED" />
+								<item text="NO-CASHOUT/FRE OWNED REFINANCE" value="NC FRE REFINANCE" />
+								<item text="NO-CASHOUT/OTHER" value="NC OTHER" />
+								<item text="NO-CASHOUT/STREAMLINED REFI" value="NC STREAMLINED" />
+								<item text="CHANGE IN RATE/TERM" value="CHANGE RATE TERM" />
+							</refinance_purpose_first>
+							<homeequity_refinance_purpose>
+								<item text="CASH" value="CASH" />
+								<item text="HOME IMPROVEMENT" value="HOME IMPROVEMENT" />
+								<item text="DEBT CONSOLIDATION" value="DEBT CONSOLIDATION" />
+								<item text="PERSONAL" value="PERSONAL" />
+								<item text="OTHER" value="OTHER" />
+								<item text="REFINANCE HOME LOAN" value="REFINANCE" />
+								<item text="MANUFACTURED HOME PURCHASE" value="MANUFACTURED HOME PURCHASE" />
+								<item text="REFINANCE CASHOUT" value="REFINANCE CASHOUT" />
+							</homeequity_refinance_purpose>
+						</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="estimated_property_value">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="property_value_source">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="" />
+              <xs:enumeration value="STATED" />
+              <xs:enumeration value="APPRAISAL" />
+              <xs:enumeration value="TAX_NOTE" />
+              <xs:enumeration value="AVM" />
+              <xs:enumeration value="PURCHPRICE" />
+              <xs:enumeration value="DRIVE_BY" />
+              <xs:enumeration value="EXISTAPRSL" />
+              <xs:enumeration value="CAUTION" />
+              <xs:enumeration value="PROP_ASSES" />
+              <xs:enumeration value="PMI_INSURE" />
+              <xs:enumeration value="BRIDGELOAN" />
+              <xs:enumeration value="EXCEPTION" />
+              <xs:enumeration value="DESKTOP" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="amount_cash_out">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="amount_requested">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="amount_approved">
+          <xs:annotation>
+            <xs:documentation>If lender product is LOC, then this field should match loc_amount.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="loan_term">
+          <xs:simpleType>
+            <xs:restriction base="xs:integer">
+              <xs:maxInclusive value="999" />
+              <xs:minInclusive value="0" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="down_payment">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="contract_received_date">
+          <xs:simpleType>
+            <xs:restriction base="xs:date" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="rate">
+          <xs:simpleType>
+            <xs:restriction base="base_rate" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="apr">
+          <xs:simpleType>
+            <xs:restriction base="base_rate" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="rate_type">
+          <xs:annotation>
+            <xs:documentation>
+							<item text="FIXED" value="F" />
+							<item text="ADJUSTABLE" value="A" />
+							<item text="GPM" value="G" />
+							<item text="OTHER" value="O" />
+						</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="F" />
+              <xs:enumeration value="A" />
+              <xs:enumeration value="G" />
+              <xs:enumeration value="O" />
+              <xs:enumeration value="" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="point">
+          <xs:simpleType>
+            <xs:restriction base="base_rate" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="lifetime_cap">
+          <xs:simpleType>
+            <xs:restriction base="base_rate" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="document_type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="FULL_DOC" />
+              <xs:enumeration value="STATED" />
+              <xs:enumeration value="NINA" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="rate_type_other_explanation">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="arm_description">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="estate_held_in">
+          <xs:annotation>
+            <xs:documentation>
+							<item text="FEE SIMPLE" value="F" />
+							<item text="LEASEHOLD" value="L" />
+						</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="F" />
+              <xs:enumeration value="L" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="request_ltv">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="6" />
+              <xs:fractionDigits value="3" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="down_payment_source">
+          <xs:annotation>
+            <xs:documentation>
+							<item text="CHECKING/SAVINGS" value="CS" />
+							<item text="DEPOSIT ON SALES CONTRACT" value="DOSC" />
+							<item text="EQUITY SOLD ON PROPERTY" value="ESOP" />
+							<item text="EQUITY PENDING FROM SALE" value="EPFSA" />
+							<item text="EQUITY PENDING FROM SUBJECT" value="EPFSU" />
+							<item text="GIFT FUNDS" value="GF" />
+							<item text="STOCKS AND BONDS" value="SAB" />
+							<item text="LOT EQUITY" value="LEQ" />
+							<item text="BRIDGE LOAN" value="BL" />
+							<item text="UNSECURE BORROWED FUNDS" value="UBF" />
+							<item text="TRUST FUNDS" value="TF" />
+							<item text="RETIREMENT FUNDS" value="RF" />
+							<item text="RENT WITH OPTION TO PURCHASE" value="ROP" />
+							<item text="LIFE INSURANCE CASH VALUE" value="LICV" />
+							<item text="SALE OF CHATTEL" value="SC" />
+							<item text="TRADE EQUITY" value="TEQ" />
+							<item text="SWEAT EQUITY" value="SEQ" />
+							<item text="CASH ON HAND" value="COH" />
+							<item text="OTHER" value="O" />
+							<item text="SECURED BORROWED FUNDS" value="SBF" />
+						</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="CS" />
+              <xs:enumeration value="DOSC" />
+              <xs:enumeration value="ESOP" />
+              <xs:enumeration value="EPFSA" />
+              <xs:enumeration value="EPFSU" />
+              <xs:enumeration value="GF" />
+              <xs:enumeration value="SAB" />
+              <xs:enumeration value="LEQ" />
+              <xs:enumeration value="BL" />
+              <xs:enumeration value="UBF" />
+              <xs:enumeration value="TF" />
+              <xs:enumeration value="RF" />
+              <xs:enumeration value="ROP" />
+              <xs:enumeration value="LICV" />
+              <xs:enumeration value="SC" />
+              <xs:enumeration value="TEQ" />
+              <xs:enumeration value="SEQ" />
+              <xs:enumeration value="COH" />
+              <xs:enumeration value="O" />
+              <xs:enumeration value="SBF" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="misc_implant">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="consumer_product_code">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="consumer_program_name">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="officer_product_code">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="officer_program_name">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="estate_held_in_lease_expiration" type="xs:date" />
+        <xs:attribute name="down_payment_description" type="xs:string" />
+        <xs:attribute name="monthly_payment">
+          <xs:annotation>
+            <xs:documentation>if this is a first td, then this will be equal to the proposed_monthly_payment.  If this is a 2nd td, then it may equal to the proposed_other_pi.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:fractionDigits value="2" />
+              <xs:totalDigits value="19" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="monthly_payment_original">
+          <xs:annotation>
+            <xs:documentation>Represents monthly payment without any price adjustments.  If price adjustments don't apply, this field should equal monthly_payment.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="lien_position">
+          <xs:simpleType>
+            <xs:restriction base="xs:integer">
+              <xs:minInclusive value="-1" />
+              <xs:maxInclusive value="3" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="case_state" type="xs:string" />
+        <xs:attribute name="number_of_payments" type="xs:int" />
+        <xs:attribute name="officer_min_payment" type="base_money" />
+        <xs:attribute name="officer_is_payment_amortized" type="base_YN" />
+        <xs:attribute name="officer_payment_percent">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:fractionDigits value="3" />
+              <xs:totalDigits value="19" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="officer_is_interest_only_payments" type="base_YN" />
+        <xs:attribute name="officer_is_other_non_amortizing" type="base_YN" />
+        <xs:attribute name="officer_is_send_na_hmda" type="base_YN" />
+        <xs:attribute name="officer_prepayment_term" type="xs:int" />
+		<xs:attribute name="officer_use_loan_date_for_LOC_expiration" type="base_YN"/>
+        <xs:attribute name="consumer_min_payment" type="base_money" />
+        <xs:attribute name="consumer_payment_percent">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:fractionDigits value="3" />
+              <xs:totalDigits value="19" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="consumer_is_interest_only_payments" type="base_YN" />
+        <xs:attribute name="consumer_is_other_non_amortizing" type="base_YN" />
+        <xs:attribute name="consumer_is_send_na_hmda" type="base_YN" />
+        <xs:attribute name="consumer_prepayment_term" type="xs:int" />
+		<xs:attribute name="consumer_use_loan_date_for_LOC_expiration" type="base_YN"/>
+        <xs:attributeGroup ref="GROUP_INDEX_MARGIN_FLOOR_CEILING" />
+        <xs:attribute name="is_balloon">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Y" />
+              <xs:enumeration value="N" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="purchaser">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="NOT_ORIGINATED" />
+              <xs:enumeration value="FANNIE_MAE" />
+              <xs:enumeration value="GINNIE_MAE" />
+              <xs:enumeration value="FREDDIE_MAC" />
+              <xs:enumeration value="FARMER_MAC" />
+              <xs:enumeration value="PRIVATE" />
+              <xs:enumeration value="COMMERCIAL" />
+              <xs:enumeration value="LIFE_INSURANCE" />
+              <xs:enumeration value="AFFILIATE" />
+              <xs:enumeration value="OTHER" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="amount_approved_variance" type="base_money" />
+        <xs:attribute name="is_LOC" type="base_YN" />
+        <xs:attribute name="property_value_source_date" type="xs:date" />
+        <xs:attribute name="is_high_priced_mortgage_loan" type="base_YN">
+          <xs:annotation>
+            <xs:documentation>
+							This is a readonly field
+						</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="is_qualified_mortgage" type="base_YN">
+          <xs:annotation>
+            <xs:documentation>
+				This is a readonly field
+			</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="is_qualified_mortgage_manual" type="base_YN" />
+        <xs:attribute name="change_in_circumstances_date" type="xs:date" />
+        <xs:attribute name="product_conversion_date" type="xs:date" />
+        <xs:attribute name="is_calculate_mapr" type="base_YN" />
+        <xs:attribute name="mapr" type="base_rate" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_FUNDING_INFO">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_FUNDING_INFO">
+        <xs:attributeGroup ref="GROUP_CUNA_FIELDS" />
+        <xs:attribute name="first_payment_date">
+          <xs:simpleType>
+            <xs:restriction base="xs:date" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="amount_financed">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="estimated_closing_date">
+          <xs:simpleType>
+            <xs:restriction base="xs:date" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="mi_coverage_percent">
+          <xs:simpleType>
+            <xs:restriction base="base_rate" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="mi_insurer_code">
+          <xs:annotation>
+            <xs:documentation>
+							<item text="GE MTG INSURANCE CORP" value="GE" />
+							<item text="MTG GUARANTEE INSURANCE CORP" value="MGIC" />
+							<item text="PMI MTG INSURANCE COMP" value="PMI" />
+							<item text="UNITED GUARANTEE RES. INS. COMP" value="UG" />
+							<item text="REPUBLIC MTG INSURANCE COMP" value="RMIC" />
+							<item text="RADIAN GUARANTY INCORP" value="RGI" />
+							<item text="TRIAD GUARANTEE RES INSURANCE COMP" value="TRIAD" />
+							<item text="CMG MTG INSURANCE CO" value="CMG" />
+						</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="GE" />
+              <xs:enumeration value="MGIC" />
+              <xs:enumeration value="PMI" />
+              <xs:enumeration value="UG" />
+              <xs:enumeration value="RMIC" />
+              <xs:enumeration value="RGI" />
+              <xs:enumeration value="TRIAD" />
+              <xs:enumeration value="CMG" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="is_escrow_waived">
+          <xs:simpleType>
+            <xs:restriction base="base_YN" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="loan_term" type="xs:int" />
+        <xs:attribute name="rate" type="base_rate" />
+        <xs:attribute name="loc_amount" type="base_money">
+          <xs:annotation>
+            <xs:documentation>If lender product is LOC, then this field should match amount_approved.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="loc_expire_date" type="xs:date" />
+        <xs:attribute name="initial_rate">
+          <xs:simpleType>
+            <xs:restriction base="base_rate" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="rate_expire_date">
+          <xs:simpleType>
+            <xs:restriction base="xs:date" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="doc_stamps_fee" type="xs:double" />
+        <xs:attribute name="total_interest_percent_le" type="xs:double" />
+        <xs:attribute name="total_interest_percent_cd" type="xs:double" />
+        <xs:attribute name="in_five_years_principal" type="base_money" />
+        <xs:attribute name="in_five_years_pimilc" type="base_money" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_STATUS">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_LOAN_STATUS">
+        <xs:attribute name="payoff_date">
+          <xs:simpleType>
+            <xs:restriction base="xs:date" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="amount_charge_off">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:totalDigits value="19" />
+              <xs:fractionDigits value="2" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="rate_lock_date" type="xs:date" />
+        <xs:attribute name="rate_lock_expiration_date" type="xs:date" />
+        <xs:attribute name="rate_lock_term" type="xs:int" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_CURRENT_TD">
+    <xs:attribute name="will_be_paid_off">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lender">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="account_number">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="balance">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="term">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rate">
+      <xs:simpleType>
+        <xs:restriction base="base_rate" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="payment">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="position" use="required">
+      <xs:annotation>
+        <xs:documentation>Specifies the position of subordination for this deed.  </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1" />
+          <xs:maxInclusive value="3" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_heloc">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="loan_amount">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_concurrent_closing">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_PROPERTY_INFO">
+    <xs:attribute name="occupancy_status">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="INVESTMENT" />
+          <xs:enumeration value="PRIMARY RESIDENCE" />
+          <xs:enumeration value="SECOND HOME" />
+          <xs:enumeration value="NA" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="occupancy_duration">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="SFR" />
+          <xs:enumeration value="2 UNIT" />
+          <xs:enumeration value="3 UNIT" />
+          <xs:enumeration value="4 UNIT" />
+          <xs:enumeration value="5+ UNIT" />
+          <xs:enumeration value="TOWNHOUSE" />
+          <xs:enumeration value="HIGH RISE CONDO" />
+          <xs:enumeration value="LOW RISE CONDO" />
+          <xs:enumeration value="PUD" />
+          <xs:enumeration value="MOBILE HOME" />
+          <xs:enumeration value="MANUFACTURED HOME" />
+          <xs:enumeration value="MIXED USE" />
+          <xs:enumeration value="CONDOTEL" />
+          <xs:enumeration value="COOP" />
+          <xs:enumeration value="COMMERCIAL" />
+          <xs:enumeration value="FARM" />
+          <xs:enumeration value="HOME BUSINESS" />
+          <xs:enumeration value="LAND" />
+          <xs:enumeration value="OTHER" />
+          <xs:enumeration value="MNL" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="serial_number">
+      <xs:annotation>
+        <xs:documentation>Applicable for Manufacture home.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="home_make" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Applicable for Manufacture home.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="address">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="city">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="state">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zip">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="county">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_address_verification_date">
+      <xs:simpleType>
+        <xs:restriction base="xs:date" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="units">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="built_year">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="3000" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_lot_year_acquired">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="3000" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_lot_original_cost">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tax_id">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tax_id_2">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tax_id_3">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lot_present_value">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_lot_improvement_costs">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="property_lot_improvement_description" type="xs:string" />
+    <xs:attribute name="is_improvement_to_be_made" type="base_YN" />
+    <xs:attribute name="is_pud" type="base_YN" />
+    <xs:attribute name="building_status" type="xs:string" />
+    <xs:attribute name="manner_title_held" type="xs:string" />
+    <xs:attribute name="census_tract_number" type="xs:string" />
+    <xs:attribute name="hmda_msa_number">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0" />
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="hmda_state_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="5" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="hmda_county_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="5" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_hoepa" type="base_YN" />
+    <xs:attribute name="is_hoepa_manual" type="base_YN" />
+    <xs:attribute name="is_hmda">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_hmda_manual">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="community_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="business_commercial_purpose" />
+    <xs:attribute name="manf_home_land_property_interest" />
+    <xs:attribute name="multifamily_affordable_units" />
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_MONTHLY_DEBT">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_MONTHLY_DEBT" />
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_NEW_TD">
+    <xs:annotation>
+      <xs:documentation>information of new trust deeds on subject property at time of closing</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="balance">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="payment">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="term">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rate">
+      <xs:simpleType>
+        <xs:restriction base="base_rate" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="margin">
+      <xs:simpleType>
+        <xs:restriction base="base_rate" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="index">
+      <xs:simpleType>
+        <xs:restriction base="base_rate" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="loan_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="repay_period">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="draw_period">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_concurrent_closing">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="position" use="required">
+      <xs:annotation>
+        <xs:documentation>Specifies the position of subordination for this deed.  </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1" />
+          <xs:maxInclusive value="3" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_HELOC" type="base_YN" />
+    <xs:attribute name="loan_amount">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_DETAILS_TRANSACTION">
+    <xs:attribute name="purchase_price">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="alteration_cost">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="land_cost">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="refinance_debts_amount">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="estimated_pre_paid_items">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="estimated_closing_costs">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="pmi_fee">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="point_amount">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="subordinate_finance_amount">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="closing_cost_paid_by_seller_amount">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_credit_type_1" type="other_credit_type" />
+    <xs:attribute name="other_credit_type_2" type="other_credit_type" />
+    <xs:attribute name="other_credit_type_3" type="other_credit_type" />
+    <xs:attribute name="other_credit_type_4" type="other_credit_type" />
+    <xs:attribute name="other_credit_amount_1">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_credit_amount_2">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_credit_amount_3">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other_credit_amount_4">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="pmi_fee_financed">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_SYSTEM">
+    <xs:annotation>
+      <xs:documentation>FNMACaseFileNumber =  loan_number when type = FNMA</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_SYSTEM">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CLOSING_BRANCH" type="BASE_BRANCH" />
+        </xs:sequence>
+        <xs:attribute name="type" use="required">
+          <xs:simpleType>
+            <xs:restriction base="xs:NMTOKEN">
+              <xs:enumeration value="LPQ" />
+              <xs:enumeration value="FNMA" />
+              <xs:enumeration value="OTHER" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="fnma_envelope_control_number">
+          <xs:annotation>
+            <xs:documentation>fnnma attributes only applicable if type = "FNMA"</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="fnma_transaction_control_number">
+          <xs:simpleType>
+            <xs:restriction base="xs:string" />
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="nmlsr_user_id" type="xs:string" />
+        <xs:attribute name="nmlsr_lender_id" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_DECLARATION">
+    <xs:attribute name="has_outstanding_judgement">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="has_bankruptcy">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="has_bad_loan">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_in_lawsuit">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_related_to_bad_loan">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_presently_delinquent">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="has_separate_maintenance">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_down_payment_borrowed">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_endorser_on_note">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="has_owner_ship_interest">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type_of_property_owned">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+          <xs:enumeration value="PR" />
+          <xs:enumeration value="SH" />
+          <xs:enumeration value="IP" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="title_hold_type">
+      <xs:annotation>
+        <xs:documentation>
+					S - Jointly
+					SP - Joint w/ Spouse
+					O - joint w/ another person
+				</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="S" />
+          <xs:enumeration value="SP" />
+          <xs:enumeration value="O" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_property_primary_residence">
+      <xs:simpleType>
+        <xs:restriction base="base_YN" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="has_outstanding_judgement_explanation" type="xs:string" />
+    <xs:attribute name="has_bankruptcy_explanation" type="xs:string" />
+    <xs:attribute name="has_bad_loan_explanation" type="xs:string" />
+    <xs:attribute name="is_in_lawsuit_explanation" type="xs:string" />
+    <xs:attribute name="is_related_to_bad_loan_explanation" type="xs:string" />
+    <xs:attribute name="is_presently_delinquent_explanation" type="xs:string" />
+    <xs:attribute name="has_separate_maintenance_explanation" type="xs:string" />
+    <xs:attribute name="is_down_payment_borrowed_explanation" type="xs:string" />
+    <xs:attribute name="is_endorser_on_note_explanation" type="xs:string" />
+    <xs:attribute name="has_judge_bankrupt_foreclosure" type="base_YN" use="optional" />
+    <xs:attribute name="has_declare_bankrupt" type="base_YN" use="optional" />
+    <xs:attribute name="has_chapter_13" type="base_YN" use="optional" />
+    <xs:attribute name="has_lawsuit_party" type="base_YN" use="optional" />
+    <xs:attribute name="has_judgement" type="base_YN" use="optional" />
+    <xs:attribute name="has_foreclosure" type="base_YN" use="optional" />
+    <xs:attribute name="has_reposession" type="base_YN" use="optional" />
+    <xs:attribute name="has_other_obligation" type="base_YN" use="optional" />
+    <xs:attribute name="has_past_due_bills" type="base_YN" use="optional" />
+    <xs:attribute name="has_co_maker" type="base_YN" use="optional" />
+    <xs:attribute name="co_maker_primary_name" type="xs:string" use="optional" />
+    <xs:attribute name="co_maker_creditor" type="xs:string" use="optional" />
+    <xs:attribute name="co_maker_amount" type="base_money" use="optional" />
+    <xs:attribute name="has_alias" type="base_YN" use="optional" />
+    <xs:attribute name="alias" type="xs:string" use="optional" />
+    <xs:attribute name="has_income_decline" type="base_YN" use="optional" />
+    <xs:attribute name="has_suits_pending" type="base_YN" use="optional" />
+    <xs:attribute name="has_alimony" type="base_YN" use="optional" />
+    <xs:attribute name="alimony_recipient" type="xs:string" use="optional" />
+    <xs:attribute name="alimony_recipient_address" type="xs:string" use="optional" />
+    <xs:attribute name="has_property_for_sale" type="base_YN" />
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_REQUESTED_PRODUCT">
+    <xs:attribute name="loan_term">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rate_type">
+      <xs:annotation>
+        <xs:documentation>
+					F - Fixed
+					A - Adjustable
+				</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="F" />
+          <xs:enumeration value="A" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="description">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="200" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="consumer_group_name" type="xs:string" />
+  </xs:complexType>
+  <xs:simpleType name="other_credit_type">
+    <xs:annotation>
+      <xs:documentation>
+				<item text="CASH DEPOSIT ON CONTRACT" value="CASH DEPOSIT ON SALES CONTRACT" />
+				<item text="SELLER CREDIT" value="SELLER CREDIT" />
+				<item text="LENDER CREDIT" value="LENDER CREDIT" />
+				<item text="RELOCATION FUNDS" value="RELOCATION FUNDS" />
+				<item text="EMPLOYER ASSISTED HOUSING" value="EMPLOYER ASSISTED HOUSING" />
+				<item text="LEASE PURCHASE FUND" value="LEASE PURCHASE FUND" />
+				<item text="OTHER" value="OTHER" />
+				<item text="BORROWER PAID FEES" value="BORROWER PAID FEES" />
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CASH DEPOSIT ON SALES CONTRACT" />
+      <xs:enumeration value="SELLER CREDIT" />
+      <xs:enumeration value="LENDER CREDIT" />
+      <xs:enumeration value="RELOCATION FUNDS" />
+      <xs:enumeration value="EMPLOYER ASSISTED HOUSING" />
+      <xs:enumeration value="LEASE PURCHASE FUND" />
+      <xs:enumeration value="OTHER" />
+      <xs:enumeration value="BORROWER PAID FEES" />
+      <xs:enumeration value="" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="MORTGAGE_FREDDIE_MAC">
+    <xs:attribute name="fre_key_id" type="xs:string" />
+    <xs:attribute name="fre_loan_id" type="xs:string" />
+    <xs:attribute name="fre_report_id" type="xs:string" />
+    <xs:attribute name="fre_credit_report_provider_id" type="xs:string" />
+    <xs:attribute name="fre_mi_coverage_type" type="xs:string" />
+    <xs:attribute name="fre_mi_payment_type" type="xs:string" />
+    <xs:attribute name="fre_mi_refund_type" type="xs:string" />
+    <xs:attribute name="fre_mi_renewel_calculation_type" type="xs:string" />
+    <xs:attribute name="fre_mi_renewel_type" type="xs:string" />
+    <xs:attribute name="fre_mi_coverage_months" type="xs:integer" />
+    <xs:attribute name="fre_mi_payment_option" type="xs:string" />
+    <xs:attribute name="fre_construction_purpose_type" type="xs:string" />
+    <xs:attribute name="fre_transaction_id" type="xs:string" />
+    <xs:attribute name="fre_reserve_amount">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:totalDigits value="19" />
+          <xs:fractionDigits value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fre_technical_affiliate_id" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_GOVERNMENT_DATA">
+    <xs:attribute name="agency_case_id" type="xs:string" />
+    <xs:attribute name="FHA_lender_id" type="xs:string" />
+    <xs:attribute name="FHA_sponsor_id" type="xs:string" />
+    <xs:attribute name="FHA_MIP_refund_amount" type="base_money" />
+    <xs:attribute name="type_of_refinance" type="xs:string" />
+    <xs:attribute name="FNMA_section_of_the_act" type="xs:string" />
+    <xs:attribute name="sales_concession_amount" type="base_money" />
+    <xs:attribute name="VA_entitlement_amount" type="base_money" />
+    <xs:attribute name="VA_monthly_maintenance" type="base_money" />
+    <xs:attribute name="VA_monthly_utilities" type="base_money" />
+    <xs:attribute name="mortgage_credit_certificate" type="xs:string" />
+    <xs:attribute name="VA_is_borrower_co_borrower_married" type="base_YN" />
+    <xs:attribute name="VA_borrower_funding_fee_percent" type="base_rate" />
+    <xs:attribute name="VA_residual_income_amount" type="base_money" />
+    <xs:attribute name="is_property_energy_efficient" type="base_YN" />
+    <xs:attribute name="FHA_borrower_financed_discount_point_amounts" type="base_rate" />
+    <xs:attribute name="FHA_alimony_liability_treatment_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="ADD_TO_DEBT" />
+          <xs:enumeration value="SUBTRACT_FROM_INCOME" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="FHA_coverage_renewal_rate_percent" type="base_rate" />
+    <xs:attribute name="FHA_upfront_MIP_percent" type="base_rate" />
+  </xs:complexType>
+  <xs:complexType name="HOME_EQUITY_HELOC_CARDS">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="4" name="CARD_HOLDER">
+        <xs:annotation>
+          <xs:documentation>Every applicant on the application will be considered a card holder, as well as any additionally defined card holders. For applicants that are card holders, note that the personally identifying fields will be treated as read-only because they are retrieved from the applicant itself, not imported from here. If there are x applicants on your application, then the first x CARD_HOLDER elements must be slotted out and reserved for them.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="first_name">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="20" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="last_name">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="20" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="m_initial">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="1" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="order_card" type="base_YN" />
+          <xs:attribute name="reference_id" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+								Sent to the host system.  Can be used for such thing as identifying card image to use.
+							</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="fee" type="xs:string" />
+          <xs:attribute default="Y" name="is_borrower" type="base_YN">
+            <xs:annotation>
+              <xs:documentation>Used to indicate if card holder is an authorized user (N) or just an applicant on the application (Y).</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="suffix">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="20" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="ssn" type="xs:string" />
+          <xs:attribute name="dob" type="xs:string" />
+          <xs:attribute name="mother_maiden" type="xs:string" />
+          <xs:attribute name="card_account_number" type="xs:string" />
+          <xs:attribute name="is_ofac_istwatch">
+            <xs:simpleType>
+              <xs:restriction base="base_YN">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="istwatch_transactiondate">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="50" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="mailing_address" type="xs:string" />
+          <xs:attribute name="mailing_city" type="xs:string" />
+          <xs:attribute name="mailing_zip" type="xs:string" />
+          <xs:attribute name="mailing_state" type="base_state" />
+          <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+            <xs:annotation>
+              <xs:documentation>This field is internal_card_holder_id for internal use only. LoansPQ will export this value and will import it, but never add this yourself or pull from another application. This internal value is auto generated by LPQ when creating a new card holder.</xs:documentation>
+            </xs:annotation>
+          </xs:anyAttribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_CONTACTS">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CONTACT_INFO">
+        <xs:complexType>
+          <xs:attribute name="contact_type" use="required">
+            <xs:annotation>
+              <xs:documentation>
+								&lt;item value="APPRAISER" text="APPRAISER" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="ASSETOWN" text="ASSET OWNER" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="BANK" text="BANK" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="BROKER" text="BROKER" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="BROKER REP" text="BROKER REP" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="BUILDER" text="BUILDER" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="BUYERAGENT" text="BUYER AGENT" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="BUYERATTOR" text="BUYER ATTORNEY" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="CALLC AGT" text="CALL CENTER AGENT" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="CLOSE AGNT" text="CLOSING AGENT" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="CREDIT RPT" text="CREDIT REPORT" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="ECOA" text="ECOA" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="ESCROW" text="ESCROW" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="FAIR HOUSE" text="FAIR HOUSING LENDING" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="FLOOD CERT" text="FLOOD CERTIFICATION" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="FLOOD INS" text="FLOOD INSURANCE" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="HOA" text="HOMEOWNER ASSOCIATION" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="INSURANCE" text="HOMEOWNER INSURANCE" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="INVESTOR" text="INVESTOR" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="LIST AGENT" text="LISTING AGENT" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="MANAGER" text="MANAGER" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="MARKETLEAD" text="MARKETING LEAD" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="MTGINSURAN" text="MORTGAGE INSURANCE" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="REALTOR" text="REALTOR" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="SELLER" text="SELLER" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="SELLER ATT" text="SELLER ATTORNEY" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="SELLERAGNT" text="SELLING AGENT" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="SERVICING" text="SERVICING" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="SURVEYOR" text="SURVEYOR" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="TITLE" text="TITLE" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="UNDERWRITE" text="UNDERWRITER" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="OTHER" text="OTHER" xmlns="http://www.meridianlink.com/CLF" /&gt;
+								&lt;item value="VESTING" text="VESTING" xmlns="http://www.meridianlink.com/CLF" /&gt;
+				  &lt;item value="APPLICANT" text="APPLICANT" xmlns="http://www.meridianlink.com/CLF" /&gt;
+				&lt;item value="NSS" text="NON SIGNING SPOUSE" enum_name="NonSigningSpouse" xmlns="http://www.meridianlink.com/CLF" /&gt;
+							</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="APPRAISER" />
+                <xs:enumeration value="ASSETOWN" />
+                <xs:enumeration value="BANK" />
+                <xs:enumeration value="BROKER" />
+                <xs:enumeration value="BROKER REP" />
+                <xs:enumeration value="BUILDER" />
+                <xs:enumeration value="BUYERAGENT" />
+                <xs:enumeration value="BUYERATTOR" />
+                <xs:enumeration value="CALLC AGT" />
+                <xs:enumeration value="CLOSE AGNT" />
+                <xs:enumeration value="CREDIT RPT" />
+                <xs:enumeration value="ECOA" />
+                <xs:enumeration value="ESCROW" />
+                <xs:enumeration value="FAIR HOUSE" />
+                <xs:enumeration value="HOA" />
+                <xs:enumeration value="INSURANCE" />
+                <xs:enumeration value="INVESTOR" />
+                <xs:enumeration value="LIST AGENT" />
+                <xs:enumeration value="MANAGER" />
+                <xs:enumeration value="MARKETLEAD" />
+                <xs:enumeration value="MTGINSURAN" />
+                <xs:enumeration value="REALTOR" />
+                <xs:enumeration value="SELLER" />
+                <xs:enumeration value="SELLER ATT" />
+                <xs:enumeration value="SELLERAGNT" />
+                <xs:enumeration value="SERVICING" />
+                <xs:enumeration value="SURVEYOR" />
+                <xs:enumeration value="TITLE" />
+                <xs:enumeration value="UNDERWRITE" />
+                <xs:enumeration value="OTHER" />
+                <xs:enumeration value="FLOOD INS" />
+                <xs:enumeration value="FLOOD CERT" />
+                <xs:enumeration value="COLLAT_OFF" />
+                <xs:enumeration value="VESTING" />
+                <xs:enumeration value="APPLICANT" />
+                <xs:enumeration value="NSS" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="contact_first_name" type="xs:string" />
+          <xs:attribute name="contact_middle_name" type="xs:string" />
+          <xs:attribute name="contact_last_name" type="xs:string" />
+          <xs:attribute name="contact_suffix" type="xs:string" />
+          <xs:attribute name="contact_work_phone" type="xs:string" />
+          <xs:attribute name="contact_address" type="xs:string" />
+          <xs:attribute name="contact_city" type="xs:string" />
+          <xs:attribute name="contact_county" type="xs:string" />
+          <xs:attribute name="contact_state" type="xs:string" />
+          <xs:attribute name="contact_zip" type="xs:string" />
+          <xs:attribute name="contact_email" type="xs:string" />
+          <xs:attribute name="company_name" type="xs:string" />
+          <xs:attribute name="department_name" type="xs:string" />
+          <xs:attribute name="company_address" type="xs:string" />
+          <xs:attribute name="company_city" type="xs:string" />
+          <xs:attribute name="company_state" type="base_state" />
+          <xs:attribute name="company_zip" type="xs:string" />
+          <xs:attribute name="company_phone" type="xs:string" />
+          <xs:attribute name="company_fax" type="xs:string" />
+          <xs:attribute name="agent_license_number" type="xs:string" />
+          <xs:attribute name="case_number" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+								ie: This would be the loan # that this contact uses.   For the case of insurance provider, this would be their policy number.
+							</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="case_effective_date" type="xs:date">
+            <xs:annotation>
+              <xs:documentation>For case of insurance provider, this could be the policy effective date.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="received_date" type="xs:date" />
+          <xs:attribute name="company_license_number" type="xs:string" />
+          <xs:attribute name="notes" type="xs:string" />
+          <xs:attribute name="contact_phone" type="xs:string" />
+          <xs:attribute name="contact_fax" type="xs:string" />
+          <xs:attribute name="contact_cell_phone" type="xs:string" />
+          <xs:attribute name="contact_pager" type="xs:string" />
+          <xs:attribute name="expiration_date" type="xs:date" />
+          <xs:attribute name="dwelling_coverage" type="xs:double" />
+          <xs:attribute name="is_flood_zone" type="base_YN" />
+          <xs:attribute name="flood_zone" type="xs:string" />
+          <xs:attribute name="agent_nmls" type="xs:string" />
+          <xs:attribute name="company_nmls" type="xs:string" />
+          <xs:attribute name="ssn" type="xs:string" />
+          <xs:attribute name="dob" type="xs:date" />
+          <xs:attribute name="is_ssn_taxid" type="base_YN" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MORTGAGE_LOAN">
+    <xs:complexContent mixed="false">
+      <xs:extension base="APP">
+        <xs:sequence>
+          <xs:element name="APPLICANTS">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="APPLICANT" type="MORTGAGE_APPLICANT" />
+              </xs:sequence>
+              <xs:attribute name="selected_product_borrower_id" use="optional">
+                <xs:annotation>
+                  <xs:documentation>Selected_product_borrower_id references the borrower_id attribute.  The applicant ID GUID is not saved.  Applicants are identified by the integer borrower_id attribute.</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="1" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="REQUESTED_PRODUCTS">
+            <xs:annotation>
+              <xs:documentation>Consumer requested products</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="PRODUCT" type="MORTGAGE_REQUESTED_PRODUCT" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PROPERTY_INFO" type="MORTGAGE_PROPERTY_INFO" />
+          <xs:element name="LOAN_INFO">
+            <xs:complexType>
+              <xs:complexContent mixed="false">
+                <xs:extension base="MORTGAGE_LOAN_INFO" />
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="PRICE_ADJUSTMENTS" type="BASE_PRICE_ADJUSTMENT_LIST" />
+          <xs:element name="LOAN_STATUS" type="MORTGAGE_STATUS" />
+          <xs:element name="DETAIL_TRANSACTION" type="MORTGAGE_DETAILS_TRANSACTION">
+            <xs:annotation>
+              <xs:documentation>Some fields are prohibited to make it explicitly clear that these fields should be dynamically calculated.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="DISBURSEMENTS" type="BASE_DISBURSEMENT_LIST" />
+          <xs:element minOccurs="0" name="TASK_LIST" type="BASE_TASK_LIST" />
+          <xs:element name="FUNDING">
+            <xs:complexType>
+              <xs:complexContent mixed="false">
+                <xs:extension base="MORTGAGE_FUNDING_INFO">
+                  <xs:sequence>
+                    <xs:element name="INSURANCE_OPTIONS">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="INSURANCE_OPTION" type="MORTGAGE_INSURANCE" />
+                        </xs:sequence>
+                        <xs:attribute name="loan_class">
+                          <xs:annotation>
+                            <xs:documentation>
+														O - Open Ended
+														C - Closed Ended
+													</xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="O" />
+                              <xs:enumeration value="C" />
+                              <xs:enumeration value="" />
+                              <xs:enumeration value="" />
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <xs:attribute name="description">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string" />
+                          </xs:simpleType>
+                        </xs:attribute>
+												<xs:attribute name="borrower_1_index" type="xs:integer" />
+												<xs:attribute name="borrower_1_is_spouse" type="xs:string" />
+												<xs:attribute name="borrower_2_index" type="xs:integer" />
+												<xs:attribute name="borrower_2_is_spouse" type="xs:string" />
+										</xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="CLOSE_END_INFO" type="BASE_CLOSE_END_INFO">
+                      <xs:annotation>
+                        <xs:documentation>Mortgage Loans only uses the cash_prepaid_finance_charge attribute</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="COMMENTS">
+            <xs:complexType>
+              <xs:complexContent mixed="false">
+                <xs:extension base="BASE_COMMENTS">
+                  <xs:sequence>
+                    <xs:element minOccurs="0" name="UNABLE_TO_FUND" />
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="CUSTOM_QUESTIONS" type="BASE_CUSTOM_QUESTIONS" />
+          <xs:element minOccurs="0" name="CONTACTS" type="MORTGAGE_CONTACTS">
+            <xs:annotation>
+              <xs:documentation>Agents and third parties involved with this loan.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element maxOccurs="unbounded" name="SYSTEM" type="MORTGAGE_SYSTEM" />
+          <xs:element minOccurs="0" name="INTEGRATION_DATA_LIST">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="INTEGRATION_DATA" type="INTEGRATION_DATA" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="MODIFICATION_HISTORY" type="BASE_MODIFICATION_HISTORY" />
+          <xs:element minOccurs="0" name="EVENT_HISTORY" type="BASE_EVENT_HISTORY" />
+          <xs:element minOccurs="0" name="WEBMS_HISTORY" type="BASE_WEBMS_HISTORY" />
+          <xs:element minOccurs="0" name="HMDA_XML" type="BASE_HMDA_XML" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

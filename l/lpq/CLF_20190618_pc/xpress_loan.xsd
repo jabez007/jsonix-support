@@ -1,0 +1,2432 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--Created with Liquid XML Studio 7.0.1.654 (http://www.liquid-technologies.com)-->
+<!--
+Modification history:
+5.223 - Added combined_secured_aggregate_amount_with_lender_no_mortgage
+5.219 - Added new id_verification_result values INVALIDSSN and MINOR and new qualifile_decision values CONSUMER and INVALIDSSN under EFUNDS_INFO
+5.217 - Added is_possible_dupe_manual to XPRESS_LOAN_INFO
+5.216 - Added new id_verification_result value NODECISION under EFUNDS_INFO
+5.213 - Added primary_money_market_link_id to ATM_CARD_TYPE
+5.206 - Added is_ofac_istwatch to BENEFICIAL_OWNERS
+5.197 - Added business_account_type_id, business_account_type_code to support new Business Account Roles.
+5.184 - Added PROFESSIONAL CORPORATION, PUBLIC FUNDS, NON-MEMBER, IOLTA, UAHROF, GOVERNMENT, TRUST to business_type
+5.177 - Changed is_minor to base_YN type
+5.172 - Added is_high_risk_business to COMPANY_INFO_TYPE element, Added is_high_risk_business and is_high_risk_consumer_manual to XPRESS_LOAN_INFO
+5.166 - Added is_bah_included field to XA Applicant 
+5.165 - Added mla_covered_status and mla_covered_date to XA Applicant
+5.159 - Added is_high_risk_consumer to XPRESS_BASE_APPLICANT, added is_high_risk_consumer and is_high_risk_consumer_manual to XPRESS_LOAN_INFO
+5.155 - Added AMD Approved/Member Declined to Xpress Status
+5.150 - Added WebMS, LoanEvent History
+5.147 - Added Other Employment Description 
+5.137 - Add Expire Date to ATM cards
+5.129 - added QualifileReasonCode1-5 and QualifileReasonText1-5, ssn_begin_issue_date, ssn_state_issued
+5.128 - added bankruptcy_score, is_debit_bureau_required, is_new_customer, incomplete_path, submit_date, monthly_liability, PRICE_ADJUSTMENTS
+5.127 - remove all CVN from CLF
+5.125 - Added cell_phone_country, home_phone_country, work_phone_country. Removed is_home_phone_foreign, is_cell_phone_foreign, is_work_phone_foreign
+5.121 - Added cc_cvn_number_enc to FUNDING_SOURCE
+5.117 - Added new enum "UNDECISIONED" as new retail_banking_decision
+5.116 - Added telecheck_score attribute under TELECHECK_INFO, added more enums to telecheck_response_code 
+5.114 - Added PRECISEID_EWS_INFO
+5.111 - Added new enum "VICTIM MESSAGE" as deluxe_decision
+5.108 - Add Organization/Club, Non Profit Corporation, Non Profit Organization
+5.102 - Add S Corporation LLC, C Corporation LLC, Partnership LLC, Sole Proprietor LLC
+5.100 - Add booking_date, booking_reference_id to XPRESS_LOAN_INFO
+5.099 - Add address_verification_date to XPRESS_BENEFICIARY, add address_verification_date, mailing_address_verification_date to SPECIAL_INFO
+5.091 - Added rewards to ATM_CARD_TYPE
+5.089 - Added card_link_id to ATM_CARD_LINK_TYPE, added cc_card_number_enc to FUNDING_SOURCE
+5.084 - Added combined_unsecured_aggregate_amount_with_lender
+5.083 - Added RETAIL_BANKING_INFO
+5.075 - Removed legacy address attributes from BASE_CURRENT_ADDRESS_CHOICE_XPRESS and COMPANY_INFO_TYPE; Removed receive_statement_method attribute from XPRESS_LOAN_INFO; Revised CURRENT_ADDRESS, MAILING_ADDRESS to be required elements under COMPANY_INFO_TYPE
+5.073 - added underwrite_result to GROUP_ACCOUNT_INFO
+5.068 - added bundle_code to GROUP_ACCOUNT_INFO
+5.063 - added qualifile_score to XPRESS_BASE_APPLICANT
+5.058 - Added is_ofac_bridger to XPRESS_BASE_APPLICANT, COMPANY_INFO_TYPE, SPECIAL_INFO and XPRESS_BENEFICIARY
+5.052 - Added ira_type SIMPLEIRA and ira_contribution_type SALARYDEDUCTION
+5.048 - Removed is_spouse attribute from XPRESS_BENEFICIARY
+5.047 - Added employment_weekly_hours and employment_business_type to XA FINANCIAL_INFO
+5.045 - Added is_fraud_fas to BASE_APPLICANT and XPRESS_BASE_APPLICANT
+5.039 - Added relation_to_primary to BASE_APPLICANT and XPRESS_BASE_APPLICANT
+5.036 - Added Employment Address, Employment Zip, Employment City, Employment State Supervisor Name and Profession Months to XA FINANCIAL_INFO
+5.027 - Added S Corporation and C Corporation to Business Entity Types
+5.025 - Change approval_date and declined_date type to dateTime
+5.024 - Added role_type
+5.021 - Added has_ofac_match to DeluxeInfo of Deluxe Detection
+5.017 - renamed passed_id_verification to id_verification_result
+5.015 - Added new Membership fee fields and Campaign code
+5.013 - added EFUNDS_INFO and IsOFACDebit attribute to XA Beneficiary and Special info
+5.005 - add is_require_confirmation
+5.002 - Initial version
+-->
+<xs:schema xmlns="http://www.meridianlink.com/CLF" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.meridianlink.com/CLF" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="BaseTypes.xsd" />
+  <xs:element name="XPRESS_LOAN">
+    <xs:complexType>
+      <xs:complexContent mixed="false">
+        <xs:extension base="XPRESS_LOAN" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="XPRESS_BASE_APPLICANT">
+    <xs:sequence>
+      <xs:element name="CURRENT_ADDRESS">
+        <xs:annotation>
+          <xs:documentation>
+						If Applicant's Address is domestic, please use Address Choice of "LOOSE_ADDRESS".
+						And "street_address_2" is currently not supported.
+
+						But if Applicant's address is foreign, then "THREE_LINE_ADDRESS" should be used. In this case,
+						all three attributes "street_address_1", "street_address_2", "street_address_3" are supported.
+					</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_CURRENT_ADDRESS_CHOICE_XPRESS">
+              <xs:attributeGroup ref="GROUP_OCCUPANCY_STATUS_DURATION" />
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="PREVIOUS_ADDRESS">
+        <xs:annotation>
+          <xs:documentation>Note: street address 2 will not be used since it's not available on the UI.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_ADDRESS_LOOSE">
+              <xs:attributeGroup ref="GROUP_OCCUPANCY_STATUS_DURATION" />
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="MAILING_ADDRESS">
+        <xs:annotation>
+          <xs:documentation>
+						For Mailing Address, both "street_address_1" and "street_address_2" are supported.
+					</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_ADDRESS_LOOSE">
+              <xs:attribute default="Y" name="is_current" type="base_YN">
+                <xs:annotation>
+                  <xs:documentation>If set to Y, then LPQ use values of current address AND any values for this element will be ignored.  Default is Y.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="FINANCIAL_INFO">
+        <xs:complexType>
+          <xs:attribute name="monthly_liability" type="xs:double" />
+          <xs:attribute name="monthly_rent" type="xs:double" />
+          <xs:attribute name="temp_monthly_housing_cost" type="xs:double" />
+          <xs:attribute name="monthly_income_base_salary" type="xs:double" />
+          <xs:attribute name="is_monthly_income_base_salary_manual" type="base_YN" />
+          <xs:attribute name="is_bah_included" type="base_YN" />
+          <xs:attribute name="employment_status">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="MI" />
+                <xs:enumeration value="OT" />
+                <xs:enumeration value="EM" />
+                <xs:enumeration value="HO" />
+                <xs:enumeration value="OW" />
+                <xs:enumeration value="RE" />
+                <xs:enumeration value="SE" />
+                <xs:enumeration value="ST" />
+                <xs:enumeration value="UN" />
+                <xs:enumeration value="RM" />
+                <xs:enumeration value="GOV" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="other_employment_description">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="100" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="employment_start_date" type="xs:date" />
+          <xs:attribute name="employed_months" type="xs:int" />
+          <xs:attribute name="employer" type="xs:string" />
+          <xs:attribute name="pay_grade" type="xs:string" />
+          <xs:attribute name="ets" type="xs:date" />
+          <xs:attribute name="employee_of_lender_type" type="base_employee_of_lender_types" />
+          <xs:attribute name="occupation" type="xs:string" />
+          <xs:attribute name="employment_address" type="xs:string" />
+          <xs:attribute name="employment_zip" type="xs:string" />
+          <xs:attribute name="employment_city" type="xs:string" />
+          <xs:attribute name="employment_state" type="base_state" />
+          <xs:attribute name="supervisor_name" type="xs:string" />
+          <xs:attribute name="profession_months" type="xs:integer" />
+          <xs:attribute name="employment_weekly_hours" type="xs:int">
+            <xs:annotation>
+              <xs:documentation>May not apply.  This field is usually not available for lenders.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="employment_business_type" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ID_CARD" type="BASE_ID_CARD" />
+      <xs:element minOccurs="0" name="ID_CARD2" type="BASE_ID_CARD" />
+      <xs:element minOccurs="0" name="APPROVAL_DENIAL_REASON" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Appears as denial reason on the UI.  The approval part in this node name may be misleading, but kept for backward compatibility.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="APPLICANT_QUESTIONS" type="BASE_APPLICANT_QUESTIONS" />
+      <xs:element minOccurs="0" name="REFERENCE" type="BASE_REFERENCE" />
+      <xs:element minOccurs="0" name="ATM_CARD_LIST">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="ATM_CARD" type="ATM_CARD_TYPE" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="DEBIT_BUREAU_INFO">
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="DEBIT_BUREAU_INFO" />
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="FOM_ANSWERED_QUESTIONS" type="FOM_ANSWERED_QUESTIONS" />
+    </xs:sequence>
+    <xs:attribute name="is_debit_bureau_required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Y" />
+          <xs:enumeration value="N" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="borrower_id" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_declined" type="xs:string" />
+    <xs:attribute name="mother_maiden_name" type="xs:string" />
+    <xs:attribute name="first_name" type="xs:string" use="required" />
+    <xs:attribute name="last_name" type="xs:string" use="required" />
+    <xs:attribute name="middle_name" type="xs:string" use="optional" />
+    <xs:attribute name="m_initial" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+					Use middle_name whenever possible since it will be more accurate with credit bureau and reduce problems down the road.
+
+					If both m_initial and middle_name are specified, then middle_name has precedence.
+				</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="1" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cell_phone" type="xs:string" />
+    <xs:attribute default="US" name="cell_phone_country" type="base_phone_country_alpha2" />
+    <xs:attribute name="home_phone" type="xs:string" />
+    <xs:attribute default="US" name="home_phone_country" type="base_phone_country_alpha2" />
+    <xs:attribute name="work_phone" type="xs:string" />
+    <xs:attribute name="work_phone_extension" type="xs:string" />
+    <xs:attribute default="US" name="work_phone_country" type="base_phone_country_alpha2" />
+    <xs:attribute name="bankruptcy_score">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="9999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="marital_status" type="xs:string" />
+    <xs:attribute name="citizenship" type="xs:string" />
+    <xs:attribute name="preferred_contact_method">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="CELL" />
+          <xs:enumeration value="WORK" />
+          <xs:enumeration value="HOME" />
+          <xs:enumeration value="EMAIL" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="suffix">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="JR" />
+          <xs:enumeration value="SR" />
+          <xs:enumeration value="II" />
+          <xs:enumeration value="III" />
+          <xs:enumeration value="IV" />
+          <xs:enumeration value="V" />
+          <xs:enumeration value="VI" />
+          <xs:enumeration value="VII" />
+          <xs:enumeration value="VIII" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dob" type="xs:date" />
+    <xs:attribute name="email" type="xs:string" />
+    <xs:attribute name="ssn" type="base_ssn" use="required" />
+    <xs:attribute name="gender">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="MALE" />
+          <xs:enumeration value="FEMALE" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="credit_score">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="9999" />
+          <xs:minInclusive value="0" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="custom_score">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:maxInclusive value="9999" />
+          <xs:minInclusive value="-9999" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="member_number" type="xs:string" />
+    <xs:attribute name="xa_requirement_id" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Please do not use.  Specifies which FOM entry the person has satisfied.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FOM_answers" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Please do not use.  Specifies the corresponding answers given that corresponds with xa_requirement_id.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="id_authentication_result">
+      <xs:annotation>
+        <xs:documentation>Default is incomplete.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL" />
+          <xs:enumeration value="INCOMPLETE" />
+          <xs:enumeration value="PASS" />
+          <xs:enumeration value="REVIEW" />
+          <xs:enumeration value="NOT_REQUIRE" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id_ver_result">
+      <xs:annotation>
+        <xs:documentation>Default is incomplete.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="INCOMPLETE" />
+          <xs:enumeration value="PASS" />
+          <xs:enumeration value="FAIL" />
+          <xs:enumeration value="OVERRIDDEN" />
+          <xs:enumeration value="REVIEW" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="pre_score_results">
+      <xs:annotation>
+        <xs:documentation>Only applicable for 1 customer.  If result is FAIL, then check pre_score_failure_reasons for more explanation of failure. If this attribute is missing, it implies UNKNOWN.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="PASS" />
+          <xs:enumeration value="FAIL" />
+          <xs:enumeration value="UNKNOWN" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="pre_score_failure_reasons" type="xs:string" />
+    <xs:attribute name="pre_score_failure_code" type="xs:integer" />
+    <xs:attribute name="is_ofac_debit" type="base_YN" />
+    <xs:attribute name="is_ofac_bridger" type="base_YN" />
+    <xs:attribute name="is_ofac_ist_watch" type="base_YN" />
+    <xs:attribute name="is_high_risk_consumer" type="base_YN" />
+    <xs:attribute default="N" name="is_ssn_tax_id" type="base_YN">
+      <xs:annotation>
+        <xs:documentation>
+					Y - ssn really represents a TIN
+					N - ssn is really an ssn
+				</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="security_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="allow_direct_mail" type="base_YN" />
+    <xs:attribute name="allow_email_solicit" type="base_YN" />
+    <xs:attribute name="allow_telemarket" type="base_YN" />
+    <xs:attribute name="allow_share_info" type="base_YN" />
+    <xs:attribute name="is_ofac_id_ver" type="base_YN" />
+    <xs:attribute name="is_fraud_prescore" type="base_YN" />
+    <xs:attribute name="relationship" type="xs:string" />
+    <xs:attribute name="role_type" type="xs:string" />
+    <xs:attribute name="relation_to_primary" type="xs:string" />
+    <xs:attribute name="is_fraud_fas" type="base_YN" />
+    <xs:attribute name="mla_covered_status" type="xs:string" />
+    <xs:attribute name="mla_covered_date" type="xs:date" />
+    <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+      <xs:annotation>
+        <xs:documentation>This field is xa_internal_applicant_type for internal use only.  LoansPQ will export this value but will not import it.  This internal value is auto generated by LPQ when creating a new loan.  If updating a loan, use the loan_number.</xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:complexType>
+  <xs:complexType name="XPRESS_APPLICANT">
+    <xs:complexContent mixed="false">
+      <xs:extension base="XPRESS_BASE_APPLICANT">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="SPOUSE" type="XPRESS_BASE_APPLICANT" />
+          <xs:element minOccurs="0" name="CREDIT_REPORT">
+            <xs:annotation>
+              <xs:documentation>
+			  -If credit report data is empty applican'ts credit report won't be imported.
+			  -If credit report's applicant-ssn mismatches the applicant's ssn credit report won't be imported.
+			  -If spouse exists, then this MUST be a joint report. Otherwise, this will be a single applicant credit report.
+			  </xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:simpleContent>
+                <xs:extension base="xs:string">
+                  <xs:attribute name="report_id" type="xs:int" use="required" />
+                  <xs:attribute name="report_format" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:NMTOKEN">
+                        <xs:enumeration value="RAW_XML" />
+                        <xs:enumeration value="MCL_COMMON" />
+                        <xs:enumeration value="MISMO" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="encoding">
+                    <xs:annotation>
+                      <xs:documentation>Default is CDATA encoding.  This will allow clients to easily access data.  However, you cannot nest CDATA -- hence if you use base64, then the credit report will be stored as base64 encoded text on the element.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:NMTOKEN">
+                        <xs:enumeration value="CDATA" />
+                        <xs:enumeration value="INNER_TEXT" />
+                        <xs:enumeration value="BASE64" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="ACCOUNT_TRANSFERS">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="ACCOUNT_TRANSFER" type="XPRESS_ACCOUNT_TRANSFER" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="is_equity_owner">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Y" />
+              <xs:enumeration value="N" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="is_passed_id_verification">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Y" />
+              <xs:enumeration value="N" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="co_is_passed_id_verification">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Y" />
+              <xs:enumeration value="N" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="joint_account_option">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="ALL" />
+              <xs:enumeration value="CHECKING" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="is_credit_union_advocate">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Y" />
+              <xs:enumeration value="N" />
+              <xs:enumeration value="" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="number_in_household" type="xs:int" />
+        <xs:attribute name="percent_business_owned" type="xs:int" />
+        <xs:attribute name="is_fraud_credit" type="base_YN" />
+        <xs:attribute name="is_ofac_credit" type="base_YN" />
+        <xs:attribute name="combined_unsecured_aggregate_amount_with_lender" type="base_money" />
+				<xs:attribute name="combined_secured_aggregate_amount_with_lender_no_mortgage" type="base_money" />
+			</xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BASE_ADDRESS_THREE_LINE_XPRESS">
+    <xs:attribute name="street_address_1" type="xs:string" />
+    <xs:attribute name="street_address_2" type="xs:string" />
+    <xs:attribute name="street_address_3" type="xs:string" />
+    <xs:attribute name="country" type="xs:string" use="optional" />
+    <xs:attribute name="zip" type="base_zip" use="optional" />
+    <xs:attribute name="city" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="BASE_CURRENT_ADDRESS_CHOICE_XPRESS">
+    <xs:annotation>
+      <xs:documentation>
+				This is used to handle complex address scenarios for the current address.
+				NOTE:the attributes provided here replicate the LOOSE_ADDRESS datatype.  If a child node is specified, it will override these values.  When LPQ exports, it will populate both these attributes AND the LOOSE_ADDRESS subnode.
+				If foreign address, then no attributes here will be set and only THREE_LINE_ADDRESS will exist.
+				UPDATE (1/8/2008): The attributes provided here will be deprecated in the near future. Please set values in the sub nodes.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0">
+      <xs:element name="STRICT_ADDRESS" type="BASE_ADDRESS_STRICT">
+        <xs:annotation>
+          <xs:documentation>DO NOT USE THIS!</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="LOOSE_ADDRESS" type="BASE_ADDRESS_LOOSE">
+        <xs:annotation>
+          <xs:documentation>Convenience address mode provided since some clients don't have parsing logic or don't support our strict mode. If LPQ cannot parse the address, the entire address will be thrown into the street name.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="THREE_LINE_ADDRESS" type="BASE_ADDRESS_THREE_LINE_XPRESS">
+        <xs:annotation>
+          <xs:documentation>Due to the complex nature of foreign addresses, we just provide 3 lines to enter addresses.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="verification_date">
+      <xs:simpleType>
+        <xs:restriction base="xs:date" />
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="XPRESS_LOAN_INFO">
+    <xs:attribute name="submit_date" type="xs:dateTime" />
+    <xs:attribute name="is_new_customer" type="base_YN" />
+    <xs:attribute name="incomplete_path" type="xs:string" />
+    <xs:attribute name="qualifying_requirement" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>This value will be generated by LPQ for convenience.  However, it will not be imported.  To do that, use the instant_memberhsip_requirement_id attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="instant_membership_requirement_id">
+      <xs:annotation>
+        <xs:documentation>32 char value stored inside LPQ.  Contact our support team if you need these values.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:length value="32" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="status" use="required">
+      <xs:annotation>
+        <xs:documentation>The Xpress App Status. It is the responsibility of the client to only set the status to a status that is active in the system. </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="NEW" />
+          <xs:enumeration value="APPROVED" />
+          <xs:enumeration value="DECLINED" />
+          <xs:enumeration value="REFERRED" />
+          <xs:enumeration value="CANCELED" />
+          <xs:enumeration value="CODEC" />
+          <xs:enumeration value="INCOMPLETE" />
+          <xs:enumeration value="PENDING" />
+          <xs:enumeration value="INSTANTAPPROVED" />
+          <xs:enumeration value="FRAUD" />
+          <xs:enumeration value="AP" />
+          <xs:enumeration value="NMI" />
+          <xs:enumeration value="DUP" />
+          <xs:enumeration value="AMD" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="create_date" type="xs:dateTime" />
+    <xs:attribute name="requirement_description_value" type="xs:string" />
+    <xs:attribute name="account_position">
+      <xs:simpleType>
+        <xs:restriction base="xs:int" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="entity_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="B" />
+          <xs:enumeration value="P" />
+          <xs:enumeration value="S" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="special_account_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+          <xs:enumeration value="" />
+          <xs:enumeration value="ESTATE" />
+          <xs:enumeration value="MEMORIAL" />
+          <xs:enumeration value="SPECIAL_FUND" />
+          <xs:enumeration value="TRUST" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="last_modified" type="xs:dateTime" />
+    <xs:attribute name="is_claimed" type="base_YN" />
+    <xs:attribute name="is_locked" type="base_YN" />
+    <xs:attribute name="first_funding_date" type="xs:date" />
+    <xs:attribute name="is_minor" type="base_YN" />
+    <xs:attribute name="is_lender_disclosure_checked" type="base_YN" />
+    <xs:attribute name="is_possible_dupe" type="base_YN" />
+	<xs:attribute name="is_possible_dupe_manual" type="base_YN" />
+    <xs:attribute name="approval_date" type="xs:dateTime" />
+    <xs:attribute name="declined_date" type="xs:dateTime" />
+    <xs:attribute name="campaign_code" type="xs:string" />
+    <xs:attribute name="booking_date" type="xs:dateTime" />
+    <xs:attribute name="booking_reference_id" type="xs:string" />
+    <xs:attribute name="is_high_risk_consumer" type="base_YN" />
+    <xs:attribute name="is_high_risk_consumer_manual" type="base_YN" />
+    <xs:attribute name="is_high_risk_business" type="base_YN" />
+    <xs:attribute name="is_high_risk_business_manual" type="base_YN" />
+    <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+      <xs:annotation>
+        <xs:documentation> selected_guidelines for internal meridian link use only</xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:complexType>
+  <xs:complexType name="XPRESS_MEMBERSHIP_FEE">
+    <xs:attribute name="membership_fee_funding_date" type="xs:date" />
+    <xs:attribute name="membership_fee_funding_amount" type="xs:string" />
+    <xs:attribute name="membership_fee_funding_status" type="xs:string" />
+    <xs:attribute name="membership_fee_funding_source_id" type="xs:string" />
+    <xs:attribute name="membership_fee_funding_base_fee" type="xs:string" />
+    <xs:attribute name="membership_fee_funding_fom_fee" type="xs:string" />
+    <xs:attribute name="membership_fee_funding_manual_fee" type="xs:string" />
+    <xs:attribute name="is_manual_membership_fee" type="base_YN" />
+  </xs:complexType>
+  <xs:complexType name="XPRESS_SYSTEM">
+    <xs:complexContent mixed="false">
+      <xs:extension base="BASE_SYSTEM">
+        <xs:attribute name="type" use="required">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="LPQ" />
+              <xs:enumeration value="DAPP" />
+              <xs:enumeration value="OTHER" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="XPRESS_BENEFICIARY">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="DEBIT_BUREAU_INFO" type="DEBIT_BUREAU_INFO" />
+    </xs:sequence>
+    <xs:attribute name="first_name" type="xs:string" />
+    <xs:attribute name="last_name" type="xs:string" />
+    <xs:attribute name="phone" type="xs:string" />
+    <xs:attribute name="email" type="xs:string" />
+    <xs:attribute name="address" type="xs:string" />
+    <xs:attribute name="address2" type="xs:string" />
+    <xs:attribute name="city" type="xs:string" />
+    <xs:attribute name="state" type="base_state" />
+    <xs:attribute name="zip" type="xs:string" />
+    <xs:attribute name="dob" type="xs:date" />
+    <xs:attribute name="relationship" type="xs:string" />
+    <xs:attribute name="ssn" type="base_ssn" />
+    <xs:attribute default="USA" name="country" type="xs:string" />
+    <xs:attribute name="middle_name" type="xs:string" />
+    <xs:attribute name="suffix" type="xs:string" />
+    <xs:attribute name="initials" type="xs:string" />
+    <xs:attribute name="work_phone" type="xs:string" />
+    <xs:attribute name="work_phone_extension" type="xs:string" />
+    <xs:attribute name="percent_share" type="xs:double" />
+    <xs:attribute name="is_trust" type="xs:string" />
+    <xs:attribute name="beneficiary_priority" type="xs:string" />
+    <xs:attribute name="is_ofac_ist_watch" type="base_YN" />
+    <xs:attribute name="is_ofac_bridger" type="base_YN" />
+    <xs:attribute name="is_ofac_debit" type="base_YN" />
+    <xs:attribute name="address_verification_date" type="xs:date" />
+  </xs:complexType>
+  <xs:complexType name="XPRESS_ACCOUNT_TRANSFER">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="5" name="ACCOUNT_INFO">
+        <xs:complexType>
+          <xs:attribute name="account_number" type="xs:string" />
+          <xs:attribute name="account_type" type="account_type" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="account_transfer_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FININS" />
+          <xs:enumeration value="AUTPAY" />
+          <xs:enumeration value="DIRDEP" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="employer" type="xs:string" />
+    <xs:attribute name="address" type="xs:string" />
+    <xs:attribute name="city" type="xs:string" />
+    <xs:attribute name="state" type="base_state" />
+    <xs:attribute name="zip" type="xs:string" />
+    <xs:attribute name="company" type="xs:string" />
+    <xs:attribute name="bank_name" type="xs:string" />
+    <xs:attribute name="close_date" type="xs:date" />
+    <xs:attribute name="account_number" type="xs:string" />
+    <xs:attribute name="partial_transfer_amount" type="base_money" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="XPRESS_ACCOUNT_FUNDING">
+    <xs:attribute name="bank_bankstate" type="base_state" />
+    <xs:attribute name="bank_bankname" type="xs:string" />
+    <xs:attribute name="funding_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="MAIL" />
+          <xs:enumeration value="CREDITCARD" />
+          <xs:enumeration value="BANK" />
+          <xs:enumeration value="INTERNALTRANSFER" />
+          <xs:enumeration value="GUARANTY_COUPON" />
+          <xs:enumeration value="CASH" />
+          <xs:enumeration value="FUTURE" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bank_account_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="CHECKING" />
+          <xs:enumeration value="SAVINGS" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="transfer_account_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="CHECKING" />
+          <xs:enumeration value="SAVINGS" />
+          <xs:enumeration value="MONEY_MARKET" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="name_on_card" type="xs:string" />
+    <xs:attribute name="routing_number" type="xs:string" />
+    <xs:attribute name="bank_account_number" type="xs:string" />
+    <xs:attribute name="cc_card_type" type="xs:string" />
+    <xs:attribute name="cc_card_number" type="xs:string" />
+    <xs:attribute name="cc_card_exp_date" type="xs:date" />
+    <xs:attribute name="amount_deposit" type="xs:double" />
+    <xs:attribute name="bank_name_on_card" type="xs:string" />
+    <xs:attribute name="transfer_account_number" type="xs:string" />
+    <xs:attribute name="billing_street_address" type="xs:string" />
+    <xs:attribute name="billing_city" type="xs:string" />
+    <xs:attribute name="billing_state" type="base_state" />
+    <xs:attribute name="billing_zip" type="base_zip" />
+    <xs:attribute name="source_of_funds" type="xs:string" />
+    <xs:attribute name="future_funding_first_name" type="xs:string" />
+    <xs:attribute name="future_funding_last_name" type="xs:string" />
+    <xs:attribute name="future_funding_middle_name" type="xs:string" />
+    <xs:attribute name="future_funding_suffix" type="xs:string" />
+    <xs:attribute name="future_funding_ssn" type="xs:string" />
+    <xs:attribute name="future_funding_ira_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+          <xs:enumeration value="COVERDELL" />
+          <xs:enumeration value="ROTH" />
+          <xs:enumeration value="ROTHBEN" />
+          <xs:enumeration value="ROTHQUAL" />
+          <xs:enumeration value="SEP" />
+          <xs:enumeration value="TRADITIONAL" />
+          <xs:enumeration value="TRADITIONALBEN" />
+          <xs:enumeration value="TRADITIONALQUAL" />
+          <xs:enumeration value="SIMPLEIRA" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="future_funding_contribution_type" type="xs:string" />
+    <xs:attribute name="future_funding_account_number" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="XPRESS_ACCOUNT_TYPES">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ACCOUNT_TYPE">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" name="SERVICES">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="SERVICE">
+                    <xs:complexType>
+                      <xs:attribute name="description" type="xs:string" />
+                      <xs:attribute name="service_type" type="xs:string" />
+                      <xs:attribute name="service_code" type="xs:string" />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="PRODUCT_CUSTOM_QUESTIONS_INTERESTED" type="BASE_CUSTOM_QUESTIONS" />
+          </xs:sequence>
+          <xs:attributeGroup ref="GROUP_ACCOUNT_INFO" />
+          <xs:attribute name="min_deposit" type="xs:double" />
+          <xs:attribute name="max_deposit" type="xs:double" />
+          <xs:attribute name="is_require_confirmation" type="base_YN" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="XPRESS_ACCOUNT_TYPES_APPROVED">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ACCOUNT_TYPE">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" name="PRICE_ADJUSTMENTS">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="PRICE_ADJUSTMENT">
+                    <xs:complexType>
+                      <xs:attribute name="description" type="xs:string" />
+                      <xs:attribute name="adjust_type" type="xs:string" />
+                      <xs:attribute name="value" type="xs:double" />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="SERVICES">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="SERVICE">
+                    <xs:complexType>
+                      <xs:attribute name="description" type="xs:string" />
+                      <xs:attribute name="service_type" type="xs:string" />
+                      <xs:attribute name="service_code" type="xs:string" />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="ACCOUNT_TYPE_RELATIONS">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="RELATION">
+                    <xs:complexType>
+                      <xs:attribute name="benefactor_type">
+                        <xs:annotation>
+                          <xs:documentation>
+														P - Payable on Death Beneficiaries.  The SSN needs to map to the beneficiary element.  If an applicant or spouse wants to be a beneficiary on the account, he/she must be added to the list of beneficiaries.
+
+														C - Specified SSN will represent a co-applicant on the account.  The SSN must be one of the applicants and not the (co)-applicant's spouse/joint.
+														J - Specified SSN will represent the joint/spouse of an applicant on the account.
+													</xs:documentation>
+                        </xs:annotation>
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="P" />
+                            <xs:enumeration value="C" />
+                            <xs:enumeration value="J" />
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                      <xs:attribute name="ssn" type="base_ssn" />
+                      <xs:attribute name="beneficiary_priority">
+                        <xs:annotation>
+                          <xs:documentation>
+														P - Primary   - tradition IRA
+														C - Contingent  - tradition IRA
+														G - Grantor   - Coverdell IRA
+														DB - Designated Beneficiary  - Coverdell IRA
+														RI - Responsible Individual  - Coverdell IRA
+														SRI - Successor Responsible Individual  - Coverdell IRA
+													</xs:documentation>
+                        </xs:annotation>
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="P" />
+                            <xs:enumeration value="C" />
+                            <xs:enumeration value="G" />
+                            <xs:enumeration value="DB" />
+                            <xs:enumeration value="RI" />
+                            <xs:enumeration value="SRI" />
+                            <xs:enumeration value="" />
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                      <xs:attribute name="beneficiary_percent_share" type="xs:double" />
+                      <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+                        <xs:annotation>
+                          <xs:documentation> ApprovedAccountTypeRelationID for internal meridian link use only</xs:documentation>
+                        </xs:annotation>
+                      </xs:anyAttribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="APPROVED_CD_INFO">
+              <xs:complexType>
+                <xs:attribute name="payment_frequency">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                      <xs:enumeration value="MATURITY" />
+                      <xs:enumeration value="MONTHLY" />
+                      <xs:enumeration value="QUARTERLY" />
+                      <xs:enumeration value="SEMIANNUALLY" />
+                      <xs:enumeration value="ANNUALLY" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="payment_method">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                      <xs:enumeration value="ACHTOCHECKING" />
+                      <xs:enumeration value="ACHTOSAVINGS" />
+                      <xs:enumeration value="CHECK" />
+                      <xs:enumeration value="COMPOUND" />
+                      <xs:enumeration value="INTERNALTRANSFER" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="payment_account_number">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="17" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="payment_account_type">
+                  <xs:annotation>
+                    <xs:documentation>Only applies if payment_method is INTERNALTRANSFER</xs:documentation>
+                  </xs:annotation>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                      <xs:enumeration value="CHECKING" />
+                      <xs:enumeration value="SAVINGS" />
+                      <xs:enumeration value="MONEY_MARKET" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="payment_routing_number">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="9" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="payment_fi_name">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="40" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="payment_fi_city">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="50" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="payment_fi_state">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="2" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="payment_fi_zip">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="10" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="is_interest_rate_an_exception" type="base_YN" />
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="APPROVED_IRA_INFO">
+              <xs:complexType>
+                <xs:attribute name="ira_type">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                      <xs:enumeration value="COVERDELL" />
+                      <xs:enumeration value="ROTH" />
+                      <xs:enumeration value="ROTHBEN" />
+                      <xs:enumeration value="ROTHQUAL" />
+                      <xs:enumeration value="SEP" />
+                      <xs:enumeration value="TRADITIONAL" />
+                      <xs:enumeration value="TRADITIONALBEN" />
+                      <xs:enumeration value="TRADITIONALQUAL" />
+                      <xs:enumeration value="SIMPLEIRA" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="contribution_type">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                      <xs:enumeration value="CONTRIBUTORY" />
+                      <xs:enumeration value="CONVERSION" />
+                      <xs:enumeration value="RECHARACTERIZATION" />
+                      <xs:enumeration value="REGULAR" />
+                      <xs:enumeration value="ROLLOVER" />
+                      <xs:enumeration value="ROLLOVEROFROTH" />
+                      <xs:enumeration value="SEP" />
+                      <xs:enumeration value="TRANSFER" />
+                      <xs:enumeration value="INDIRECTCONVERSION" />
+                      <xs:enumeration value="DIRECTROLLOVER" />
+                      <xs:enumeration value="INDIRECTROLLOVER" />
+                      <xs:enumeration value="SALARYDEDUCTION" />
+                      <xs:enumeration value="" />
+                      <xs:enumeration value="COVERDELL_ANNUAL" />
+                      <xs:enumeration value="COVERDELL_ROLLOVER" />
+                      <xs:enumeration value="COVERDELL_TRANSFER" />
+                      <xs:enumeration value="COVERDELL_CONTRIBUT" />
+                      <xs:enumeration value="COVERDELL_REGULAR" />
+                      <xs:enumeration value="COVERDELL_INDIRCONV" />
+                      <xs:enumeration value="COVERDELL_DIRROLL" />
+                      <xs:enumeration value="COVERDELL_INDIRROLL" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="contribution_year">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="4" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="is_primary_retirement_account">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="1" />
+                      <xs:enumeration value="Y" />
+                      <xs:enumeration value="N" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="custodian_name">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="50" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="custodian_address">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="100" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="custodian_city">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="50" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="custodian_state">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="2" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="custodian_zip">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="10" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="custodian_phone" type="xs:string" />
+                <xs:attribute name="account_transferring_from">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="transfer_from_type">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                      <xs:enumeration value="SIMPLE" />
+                      <xs:enumeration value="TRADITIONAL" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="transfer_percent">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:double">
+                      <xs:maxInclusive value="100" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="close_ira">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="1" />
+                      <xs:enumeration value="Y" />
+                      <xs:enumeration value="N" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="place_in_conduit_ira">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="1" />
+                      <xs:enumeration value="Y" />
+                      <xs:enumeration value="N" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="asset_description">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="40" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="amount_in_ira" type="xs:double" />
+                <xs:attribute name="amount_to_be_transferred" type="xs:double" />
+                <xs:attribute name="transfer_instruction">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                      <xs:enumeration value="MATURITY" />
+                      <xs:enumeration value="IMMEDIATELY" />
+                      <xs:enumeration value="TRANSFERINKIND" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="required_min_distribution">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="20" />
+                      <xs:enumeration value="DISTRIBUTEPRIOR" />
+                      <xs:enumeration value="INCLUDEAMOUNT" />
+                      <xs:enumeration value="SEGREGATE" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="can_change_beneficiary">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="1" />
+                      <xs:enumeration value="Y" />
+                      <xs:enumeration value="N" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="continue_service_after_age_of_maturity">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="1" />
+                      <xs:enumeration value="Y" />
+                      <xs:enumeration value="N" />
+                      <xs:enumeration value="" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="deposit_year">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:maxLength value="4" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="APPROVED_ACCOUNT_LINKS">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="APPROVED_ACCOUNT_LINK" type="APPROVED_ACCOUNT_LINK_TYPE" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="DIRECT_DEPOSIT" type="DIRECT_DEPOSIT_TYPE" />
+            <xs:element minOccurs="0" name="PRODUCT_CUSTOM_QUESTIONS_APPROVED" type="BASE_CUSTOM_QUESTIONS" />
+          </xs:sequence>
+          <xs:attribute name="id" type="base_guid">
+            <xs:annotation>
+              <xs:documentation>
+					This is deprecated. Please do not use. It will be ignored.
+				</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="clf_approved_account_type_id" type="xs:string" />
+          <xs:attribute name="clf_internal_transfer_id" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Id used to match an approved account type to an internal transfer.  </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="is_created" type="base_YN">
+            <xs:annotation>
+              <xs:documentation>Indicates whether the account has been created on the core system.  </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attributeGroup ref="GROUP_ACCOUNT_INFO" />
+          <xs:attribute name="check_routing_number" type="xs:string" />
+          <xs:attribute name="funding_date" type="xs:date" />
+          <xs:attribute name="funding_source_id" type="xs:string" />
+          <xs:attribute name="clf_funding_source_id" type="xs:string" />
+          <xs:attribute name="source_of_funds" type="xs:string" />
+          <xs:attribute name="funded_status">
+            <xs:annotation>
+              <xs:documentation>
+								RF - Ready for Funding
+								FUN - Funded
+								UF - Unable to Fund
+								PROC - Processing
+							</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="RF" />
+                <xs:enumeration value="FUN" />
+                <xs:enumeration value="UF" />
+                <xs:enumeration value="PROC" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="is_rate_override" type="base_YN" />
+          <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+            <xs:annotation>
+              <xs:documentation>ApprovedAccountTypeID for internal use only</xs:documentation>
+            </xs:annotation>
+          </xs:anyAttribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="XPRESS_FUNDING_SOURCES">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FUNDING_SOURCE">
+        <xs:complexType>
+          <xs:attribute name="funding_source_id" type="xs:string" />
+          <xs:attribute name="clf_funding_source_id" type="xs:string" />
+          <xs:attribute name="funding_type">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="MAIL" />
+                <xs:enumeration value="CREDITCARD" />
+                <xs:enumeration value="BANK" />
+                <xs:enumeration value="INTERNALTRANSFER" />
+                <xs:enumeration value="GUARANTY_COUPON" />
+                <xs:enumeration value="CASH" />
+                <xs:enumeration value="FUTURE" />
+                <xs:enumeration value="NOT_FUNDING" />
+                <xs:enumeration value="PAYPAL" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="name_on_card" type="xs:string" />
+          <xs:attribute name="routing_number" type="xs:string" />
+          <xs:attribute name="cc_card_type" type="xs:string" />
+          <xs:attribute name="cc_card_number" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>This is a one way field used to import UNENCRYPTED data into LPQ.  For PCI compliance reason, it cannot be exported since we never store decrypted content inside LPQ.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="cc_card_last4">
+            <xs:annotation>
+              <xs:documentation>CC last 4 is captured during import and export to mitigate the fact that we do not hold the full card # in system.  It will only be imported if cc_card_number is blank.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="4" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="cc_card_exp_date" type="xs:date" />
+          <xs:attribute name="cc_charge_failure_count" type="xs:int" />
+          <xs:attribute name="bank_name_on_card" type="xs:string" />
+          <xs:attribute name="bank_account_number" type="xs:string" />
+          <xs:attribute name="bank_bankstate" type="base_state" />
+          <xs:attribute name="bank_bankname" type="xs:string" />
+          <xs:attribute name="bank_account_type">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="CHECKING" />
+                <xs:enumeration value="SAVINGS" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="transfer_account_number" type="xs:string" />
+          <xs:attribute name="billing_street_address" type="xs:string" />
+          <xs:attribute name="billing_city" type="xs:string" />
+          <xs:attribute name="billing_state" type="base_state" />
+          <xs:attribute name="billing_zip" type="base_zip" />
+          <xs:attribute name="microdeposit_amount_1" type="xs:double" />
+          <xs:attribute name="microdeposit_amount_2" type="xs:double" />
+          <xs:attribute name="microdeposit_failure_count" type="xs:int" />
+          <xs:attribute name="microdeposit_status">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="" />
+                <xs:enumeration value="FAIL" />
+                <xs:enumeration value="PASS" />
+                <xs:enumeration value="PEND" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="transfer_account_type">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="CHECKING" />
+                <xs:enumeration value="SAVINGS" />
+                <xs:enumeration value="MONEY_MARKET" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="future_funding_first_name" type="xs:string" />
+          <xs:attribute name="future_funding_last_name" type="xs:string" />
+          <xs:attribute name="future_funding_middle_name" type="xs:string" />
+          <xs:attribute name="future_funding_suffix" type="xs:string" />
+          <xs:attribute name="future_funding_ssn" type="xs:string" />
+          <xs:attribute name="future_funding_ira_type">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="20" />
+                <xs:enumeration value="COVERDELL" />
+                <xs:enumeration value="ROTH" />
+                <xs:enumeration value="ROTHBEN" />
+                <xs:enumeration value="ROTHQUAL" />
+                <xs:enumeration value="SEP" />
+                <xs:enumeration value="TRADITIONAL" />
+                <xs:enumeration value="TRADITIONALBEN" />
+                <xs:enumeration value="TRADITIONALQUAL" />
+                <xs:enumeration value="SIMPLEIRA" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="future_funding_contribution_type" type="xs:string" />
+          <xs:attribute name="future_funding_account_number" type="xs:string" />
+          <xs:attribute name="paypal_paykey" type="xs:string" />
+          <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+            <xs:annotation>
+              <xs:documentation>This field is cc_card_number_enc for internal use only. </xs:documentation>
+            </xs:annotation>
+          </xs:anyAttribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="COMPANY_INFO_TYPE">
+    <xs:sequence>
+      <xs:element name="CURRENT_ADDRESS">
+        <xs:annotation>
+          <xs:documentation>
+						For Business Address, please use Address Choice of "LOOSE_ADDRESS".
+						Also, Business Address currently does NOT support "street_address_2".
+					</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_CURRENT_ADDRESS_CHOICE_XPRESS">
+              <xs:attributeGroup ref="GROUP_OCCUPANCY_STATUS_DURATION" />
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="MAILING_ADDRESS">
+        <xs:annotation>
+          <xs:documentation>
+						For Business Mailing Address, both "street_address_1" and "street_address_2" are supported.
+					</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_ADDRESS_LOOSE">
+              <xs:attribute default="Y" name="is_current" type="base_YN">
+                <xs:annotation>
+                  <xs:documentation>If set to Y, then LPQ use values of current address AND any values for this element will be ignored.  Default is Y.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="PREVIOUS_ADDRESS">
+        <xs:annotation>
+          <xs:documentation>Note: street address 2 will not be used since it's not available on the UI.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="BASE_ADDRESS_LOOSE">
+              <xs:attributeGroup ref="GROUP_OCCUPANCY_STATUS_DURATION" />
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="FOM_ANSWERED_QUESTIONS" type="FOM_ANSWERED_QUESTIONS" />
+      <xs:element minOccurs="0" name="DEBIT_BUREAU_INFO" type="DEBIT_BUREAU_INFO" />
+    </xs:sequence>
+    <xs:attribute name="tax_id">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="member_number" type="xs:string" />
+    <xs:attribute name="allow_direct_mail" type="base_YN" />
+    <xs:attribute name="allow_email_solicit" type="base_YN" />
+    <xs:attribute name="allow_telemarket" type="base_YN" />
+    <xs:attribute name="allow_share_info" type="base_YN" />
+    <xs:attribute name="business_type">
+      <xs:annotation>
+        <xs:documentation>
+					<business_types>
+						<item text="PARTNERSHIP" value="PARTNER" />
+						<item text="CORPORATION" value="CORP" />
+						<item text="S CORPORATION" value="SCORP" />
+						<item text="C CORPORATION" value="CCORP" />
+						<item text="NON-PROFIT ORG. OR CORP." value="NONPROFIT" />
+						<item text="LIMITED LIABILITY COMPANY" value="LLC" />
+						<item text="SOLE PROPRIETORSHIP" value="SP" />
+						<item text="ASSOCIATION" value="ASSN" />
+						<item text="C CORPORATION LLC" value="CCORPLLC" />
+						<item text="S CORPORATION LLC" value="SCORPLLC" />
+						<item text="PARTNERSHIP LLC" value="PARTNERLLC" />
+						<item text="SOLE PROPRIETOR LLC" value="SPLLC" />
+						<item text="ORGANIZATION/CLUB" value="ORG_OR_CLUB" />
+						<item text="NON PROFIT CORPORATION" value="NONPROFITCORP" />
+						<item text="NON PROFIT ORGANIZATION" value="NONPROFITORG" />
+						<item text="PROFESSIONAL CORPORATION" value="PROFESSIONALCORP" />
+						<item text="PUBLIC FUNDS" value="PUBLICFUNDS" />
+						<item text="NON-MEMBER" value="NONMEMBER" />
+						<item text="IOLTA" value="IOLTA" />
+						<item text="UAHROF" value="UAHROF" />
+						<item text="GOVERNMENT" value="GOVERNMENT" />
+						<item text="TRUST" value="TRUST" />
+						<item text="OTHER" value="OTHER" />
+					</business_types>
+				</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="business_type_other">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="200" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="business_description">
+      <xs:simpleType>
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="business_account_type_code" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+         Business Account Type's Account Code. This is not used for DBA.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute default="N" name="is_tax_id_ssn" type="base_YN">
+      <xs:annotation>
+        <xs:documentation>
+					Y - the business_tax_id represents a SSN
+					N (default) - the busess_tax_id represents a TIN
+				</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="security_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="company_name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="additional_name_1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="additional_name_2">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="phone">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cell_phone">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fax">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="industry">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="200" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="email">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="establish_date" type="xs:date" />
+    <xs:attribute name="state_registered">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="annual_revenue" type="xs:double" />
+    <xs:attribute name="num_employees" type="xs:int" />
+    <xs:attribute name="primary_bank">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="40" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_ofac_istwatch" type="base_YN" />
+    <xs:attribute name="is_ofac_bridger" type="base_YN" />
+    <xs:attribute name="id_ver_result">
+      <xs:annotation>
+        <xs:documentation>Default is incomplete.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="INCOMPLETE" />
+          <xs:enumeration value="PASS" />
+          <xs:enumeration value="FAIL" />
+          <xs:enumeration value="OVERRIDDEN" />
+          <xs:enumeration value="REVIEW" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_ofac_debit" type="base_YN" />
+    <xs:attribute name="is_high_risk_business" type="base_YN" />
+    <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+      <xs:annotation>
+        <xs:documentation>
+          This field is internal_business_account_type_id for internal use only. LoansPQ will export this value and will import it, but never add this yourself or pull from another application. This internal value is auto generated by LPQ when creating a new business account type.
+          This is not used for DBA.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:complexType>
+  <xs:complexType name="DEDUCTION_TYPE">
+    <xs:attribute name="added_date" type="xs:string" use="optional" />
+    <xs:attribute name="agent_id" type="xs:string" use="optional" />
+    <xs:attribute name="amount" type="xs:double" use="optional" />
+    <xs:attribute name="approved" type="base_YN" use="optional" />
+    <xs:attribute name="deduction_item_id" type="xs:string" use="optional" />
+    <xs:attribute name="deduction_mode" type="xs:string" use="optional" />
+    <xs:attribute name="deduction_type" type="xs:string" use="optional" />
+    <xs:attribute name="edited_date" type="xs:string" use="optional" />
+    <xs:attribute name="effective_date" type="xs:string" use="optional" />
+    <xs:attribute name="offering_id" type="xs:string" use="optional" />
+    <xs:attribute name="offering_name" type="xs:string" use="optional" />
+    <xs:attribute name="offering_type" type="xs:string" use="optional" />
+    <xs:attribute name="package_id" type="xs:string" use="optional" />
+    <xs:attribute name="package_name" type="xs:string" use="optional" />
+    <xs:attribute name="signed" type="base_YN" use="optional" />
+    <xs:attribute name="ssn" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="SPECIAL_INFO">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="FOM_ANSWERED_QUESTIONS" type="FOM_ANSWERED_QUESTIONS" />
+      <xs:element minOccurs="0" name="DEBIT_BUREAU_INFO" type="DEBIT_BUREAU_INFO" />
+    </xs:sequence>
+    <xs:attribute name="name">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="40" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="additional_name_1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="40" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="additional_name_2">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="40" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tax_id">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_tax_id_ssn">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="1" />
+          <xs:enumeration value="Y" />
+          <xs:enumeration value="N" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="security_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="address1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="address2">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="city">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="state">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zip">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="country">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="address_verification_date" type="xs:date" />
+    <xs:attribute name="is_mailing_current" type="base_YN">
+      <xs:annotation>
+        <xs:documentation>If set to Y, then LPQ use values of permanent address AND any values for this element will be ignored.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="mailing_address1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="mailing_address2">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="100" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="mailing_city">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="mailing_state">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="2" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="mailing_zip">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="10" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="mailing_country">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="mailing_address_verification_date" type="xs:date" />
+    <xs:attribute name="establish_date" type="xs:date" />
+    <xs:attribute name="member_number" type="xs:string" />
+    <xs:attribute name="phone">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cell_phone">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fax">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="email">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="special_account_type_id">
+      <xs:annotation>
+        <xs:documentation>Internal 32 charactor id used to represent account.   If you want to export data into LPQ, please ignore this attribute and use special_account_type_code.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:length value="32" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="special_account_type_code" type="xs:string" />
+    <xs:attribute name="is_ofac_ist_watch" type="base_YN" />
+    <xs:attribute name="allow_direct_mail" type="base_YN" />
+    <xs:attribute name="allow_email_solicit" type="base_YN" />
+    <xs:attribute name="allow_telemarket" type="base_YN" />
+    <xs:attribute name="allow_share_info" type="base_YN" />
+    <xs:attribute name="is_ofac_debit" type="base_YN" />
+    <xs:attribute name="is_ofac_bridger" type="base_YN" />
+    <xs:attribute name="id_ver_result">
+      <xs:annotation>
+        <xs:documentation>Default is incomplete.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="INCOMPLETE" />
+          <xs:enumeration value="PASS" />
+          <xs:enumeration value="FAIL" />
+          <xs:enumeration value="OVERRIDDEN" />
+          <xs:enumeration value="REVIEW" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="ATM_CARD_TYPE">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ATM_CARD_LINK_LIST">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="ATM_CARD_LINK" type="ATM_CARD_LINK_TYPE" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="is_created" type="base_YN" />
+    <xs:attribute name="pin_offset" type="xs:string" />
+    <xs:attribute name="is_rewards" type="base_YN" />
+    <xs:attribute name="rewards" type="xs:string" />
+    <xs:attribute name="is_nsfod" type="base_YN" />
+    <xs:attribute name="free_transactions" type="xs:integer" />
+    <xs:attribute name="account_number" type="xs:string" />
+    <xs:attribute name="primary_checking_link_id" type="xs:string" />
+    <xs:attribute name="primary_savings_link_id" type="xs:string" />
+    <xs:attribute name="primary_money_market_link_id" type="xs:string" />
+    <xs:attribute name="primary_creditline_link_id" type="xs:string" />
+    <xs:attribute name="card_type" type="xs:string" />
+    <xs:attribute name="is_order_pin" type="base_YN" />
+    <xs:attribute name="expire_date" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="ATM_CARD_LINK_TYPE">
+    <xs:attribute name="card_link_id" type="xs:string" />
+    <xs:attribute name="reference_type" type="account_relation_type" use="required" />
+    <xs:attribute name="reference_id" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>If link is a reference to one of the approved account, then this field must match the id for the approved account types.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="is_linked" type="base_YN" />
+    <xs:attribute name="date_linked" type="xs:date" />
+    <xs:attribute name="description" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="INTERNAL_TRANSFER_TYPE">
+    <xs:attribute name="transfer_from_id" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Id that references the From account. Account Id for external account or a clf_internal_transfer_id for an internal account. </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="transfer_from_id_type" type="account_relation_type" use="required" />
+    <xs:attribute name="transfer_to_id" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Id that references the To account. Account Id for external account or a clf_internal_transfer_id for an internal account. </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="transfer_to_id_type" type="account_relation_type" use="required" />
+    <xs:attribute name="transfer_to_account_type" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Type of account we're transfering to (ie: CHECKING, SAVINGS, IRA, etc.)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="frequency" type="xs:string" />
+    <xs:attribute name="scheduled_day">
+      <xs:annotation>
+        <xs:documentation>Can be a number 1-30 or the 3 char representation of day of week.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="3" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="amount" type="base_money" />
+    <xs:attribute name="start_date" type="xs:date" />
+    <xs:attribute name="end_date" type="xs:date" />
+  </xs:complexType>
+  <xs:complexType name="DIRECT_DEPOSIT_TYPE">
+    <xs:attribute name="direct_deposit_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="EMP" />
+          <xs:enumeration value="GOV" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="state" type="base_state" />
+    <xs:attribute name="account_type" type="xs:string" />
+    <xs:attribute name="account_number" type="xs:string" />
+    <xs:attribute name="company_name" type="xs:string" />
+    <xs:attribute name="id_number" type="xs:string" />
+    <xs:attribute name="company_phone" type="xs:string" />
+    <xs:attribute name="company_fax" type="xs:string" />
+    <xs:attribute name="payroll_id" type="xs:string" />
+    <xs:attribute name="payment_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="CIVIL_RETIRE" />
+          <xs:enumeration value="FED_SALARY" />
+          <xs:enumeration value="MIL_ACTIVE" />
+          <xs:enumeration value="MIL_RETIRE" />
+          <xs:enumeration value="MIL_SURVIVOR" />
+          <xs:enumeration value="OTHER" />
+          <xs:enumeration value="RAIL_RETIRE" />
+          <xs:enumeration value="SOC_SEC" />
+          <xs:enumeration value="SUP_SEC" />
+          <xs:enumeration value="VA" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="branch_of_service">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="COAST_GUARD" />
+          <xs:enumeration value="AIR_FORCE" />
+          <xs:enumeration value="ARMY" />
+          <xs:enumeration value="CIA" />
+          <xs:enumeration value="MARINES" />
+          <xs:enumeration value="NAVY" />
+          <xs:enumeration value="ORS" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="other" type="xs:string" />
+    <xs:attribute name="allotment_of_payment" type="base_YN" />
+    <xs:attribute name="amount" type="base_money" />
+    <xs:attribute name="name1" type="xs:string" />
+    <xs:attribute name="name2" type="xs:string" />
+    <xs:attribute name="agency_name" type="xs:string" />
+    <xs:attribute name="agency_address" type="xs:string" />
+    <xs:attribute name="agency_city" type="xs:string" />
+    <xs:attribute name="agency_state" type="base_state" />
+    <xs:attribute name="agency_zip" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="APPROVED_ACCOUNT_LINK_TYPE">
+    <xs:attribute name="approved_account_type_link_id" type="xs:string" />
+    <xs:attribute name="reference_type" type="account_relation_type" use="required" />
+    <xs:attribute name="reference_id">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is_linked" type="base_YN" />
+    <xs:attribute name="date_linked" type="xs:date" />
+  </xs:complexType>
+  <xs:simpleType name="account_relation_type">
+    <xs:annotation>
+      <xs:documentation>
+				Used to indicate if the account we're linking to represents:
+				I -  an internal  LoansPQ account
+				E - an external account (ie: from an external bank or core system).
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="I" />
+      <xs:enumeration value="E" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="account_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CD" />
+      <xs:enumeration value="CHECKING" />
+      <xs:enumeration value="SAVINGS" />
+      <xs:enumeration value="MONEY_MARKET" />
+      <xs:enumeration value="SAVINGS_BONDS" />
+      <xs:enumeration value="IRA" />
+      <xs:enumeration value="OTHER" />
+      <xs:enumeration value="LOANS" />
+      <xs:enumeration value="IRACD" />
+      <xs:enumeration value="HSA" />
+      <xs:enumeration value="">
+        <xs:annotation>
+          <xs:documentation>Please don't use blank account_type, it doesn't make sense and will be depracated in future release.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attributeGroup name="GROUP_ACCOUNT_INFO">
+    <xs:attribute name="account_type" type="account_type" use="required">
+      <xs:annotation>
+        <xs:documentation>
+					<xpress_account_types>
+						<item text="CD" value="CD" />
+						<item text="CHECKING" value="CHECKING" />
+						<item text="SAVINGS" value="SAVINGS" />
+						<item text="MONEY MARKET" value="MONEY_MARKET" />
+						<item text="SAVINGS BONDS" value="SAVINGS_BONDS" />
+						<item text="IRA" value="IRA" />
+						<item text="OTHER" value="OTHER" />
+						<item text="HSA" value="HSA" />
+					</xpress_account_types>
+				</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="apy" type="base_rate" />
+    <xs:attribute name="rate" type="base_rate" />
+    <xs:attribute name="amount_deposit" type="xs:double" />
+    <xs:attribute name="account_name" type="xs:string" />
+    <xs:attribute name="account_number" type="xs:string" />
+    <xs:attribute name="suffix" />
+    <xs:attribute name="interest_rate_type" type="xs:string" use="optional" />
+    <xs:attribute name="cd_additions_permitted" type="xs:string" use="optional" />
+    <xs:attribute name="cd_renewability" type="xs:string" use="optional" />
+    <xs:attribute name="issue_date" type="xs:date" />
+    <xs:attribute name="maturity_date" type="xs:date" />
+    <xs:attribute name="product_code" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Unique code that identifies the product.   This is used to reverse look up and link acccount back to the definition within LoansPQ.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="rate_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="term" type="xs:int" />
+    <xs:attribute name="bundle_code">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="underwrite_result">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="S" />
+          <xs:enumeration value="P" />
+          <xs:enumeration value="Q" />
+          <xs:enumeration value="F" />
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="term_type">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="D" />
+          <xs:enumeration value="M" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:anyAttribute namespace="http://www.meridianlink.com/InternalUse">
+      <xs:annotation>
+        <xs:documentation>This field is internal_account_type_id for internal use only.  LoansPQ will export this value but will not import it.  This internal value is auto generated by LPQ when creating a new loan.  If updating a loan, use the loan_number.</xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:attributeGroup>
+  <xs:complexType name="DEBIT_BUREAU_INFO">
+    <xs:sequence minOccurs="0">
+      <xs:element minOccurs="0" name="EFUNDS_INFO">
+        <xs:complexType>
+          <xs:attribute name="qualifile_reason_code1" type="xs:string" />
+          <xs:attribute name="qualifile_reason_code2" type="xs:string" />
+          <xs:attribute name="qualifile_reason_code3" type="xs:string" />
+          <xs:attribute name="qualifile_reason_code4" type="xs:string" />
+          <xs:attribute name="qualifile_reason_code5" type="xs:string" />
+          <xs:attribute name="qualifile_reason_text1" type="xs:string" />
+          <xs:attribute name="qualifile_reason_text2" type="xs:string" />
+          <xs:attribute name="qualifile_reason_text3" type="xs:string" />
+          <xs:attribute name="qualifile_reason_text4" type="xs:string" />
+          <xs:attribute name="qualifile_reason_text5" type="xs:string" />
+          <xs:attribute name="ssn_begin_issue_date" type="xs:string" />
+          <xs:attribute name="ssn_state_issued" type="xs:string" />
+          <xs:attribute name="qualifile_score">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="4" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="qualifile_decision">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="ACCEPT" />
+                <xs:enumeration value="APPROVE" />
+                <xs:enumeration value="DECLINE" />
+                <xs:enumeration value="DENY" />
+                <xs:enumeration value="REVIEW" />
+                <xs:enumeration value="" />
+                <xs:enumeration value="OVERRIDDEN" />
+                <xs:enumeration value="PLEASECALL" />
+								<xs:enumeration value="CONSUMER" />
+								<xs:enumeration value="INVALIDSSN" />
+							</xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="qualifile_transaction_date" type="xs:date" />
+          <xs:attribute name="id_verification_result">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="PASSED" />
+                <xs:enumeration value="FAILED" />
+                <xs:enumeration value="OVERRIDDEN" />
+                <xs:enumeration value="NORECORDFOUND" />
+                <xs:enumeration value="NODECISION" />
+								<xs:enumeration value="INVALIDSSN" />
+								<xs:enumeration value="MINOR" />
+								<xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="id_verification_transaction_date" type="xs:date" />
+          <xs:attribute name="id_verification_transaction_id" type="xs:string" />
+          <xs:attribute name="passed_ofac">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="Y" />
+                <xs:enumeration value="N" />
+                <xs:enumeration value="O" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="ofac_transaction_date" type="xs:date" />
+          <xs:attribute name="ofac_transaction_id" type="xs:string" />
+          <xs:attribute name="chex_id" type="xs:string" />
+          <xs:attribute name="qualifile_override_reason" type="xs:string" />
+          <xs:attribute name="qualifile_override_loan_officer_id" type="xs:string" />
+          <xs:attribute name="ssn_validation" type="xs:string" />
+          <xs:attribute name="is_qualifile_manual_entry" type="base_YN" />
+          <xs:attribute name="qualifile_manual_entry_loan_officer_id" type="xs:string" />
+          <xs:attribute name="id_verification_user_id" type="xs:string" />
+          <xs:attribute name="id_verification_user_type">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="C" />
+                <xs:enumeration value="L" />
+                <xs:enumeration value="U" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="ofac_user_id" type="xs:string" />
+          <xs:attribute name="ofac_user_type">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="C" />
+                <xs:enumeration value="L" />
+                <xs:enumeration value="U" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="qualifile_user_id" type="xs:string" />
+          <xs:attribute name="qualifile_user_type">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="C" />
+                <xs:enumeration value="L" />
+                <xs:enumeration value="U" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="id_verification_override_reason" type="xs:string" />
+          <xs:attribute name="ofac_override_reason" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="DELUXE_INFO">
+        <xs:complexType>
+          <xs:attribute name="deluxe_decision">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="CAUTION" />
+                <xs:enumeration value="DECLINE" />
+                <xs:enumeration value="PROCEED" />
+                <xs:enumeration value="REVERIFY" />
+                <xs:enumeration value="VICTIM MESSAGE" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="deluxe_transaction_date" type="xs:date" />
+          <xs:attribute name="has_ofac_match">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="Y" />
+                <xs:enumeration value="N" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="TELECHECK_INFO">
+        <xs:complexType>
+          <xs:attribute name="telecheck_response_code">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="07" />
+                <xs:enumeration value="95" />
+                <xs:enumeration value="03" />
+                <xs:enumeration value="09" />
+                <xs:enumeration value="12" />
+                <xs:enumeration value="13" />
+                <xs:enumeration value="41" />
+                <xs:enumeration value="69" />
+                <xs:enumeration value="72" />
+                <xs:enumeration value="89" />
+                <xs:enumeration value="08" />
+                <xs:enumeration value="73" />
+                <xs:enumeration value="88" />
+                <xs:enumeration value="98" />
+                <xs:enumeration value="27" />
+                <xs:enumeration value="15" />
+                <xs:enumeration value="16" />
+                <xs:enumeration value="44" />
+                <xs:enumeration value="49" />
+                <xs:enumeration value="97" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="telecheck_transaction_date" type="xs:date" />
+          <xs:attribute name="telecheck_approval_code" type="xs:string" />
+          <xs:attribute name="telecheck_score" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="RETAIL_BANKING_INFO">
+        <xs:complexType>
+          <xs:attribute name="retail_banking_decision">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="APPROVED" />
+                <xs:enumeration value="DECLINED" />
+                <xs:enumeration value="PENDING" />
+                <xs:enumeration value="UNDECISIONED" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="retail_banking_transaction_date" type="xs:date" />
+          <xs:attribute name="retail_banking_has_ofac_match">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="Y" />
+                <xs:enumeration value="N" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="PRECISEID_EWS_INFO">
+        <xs:complexType>
+          <xs:attribute name="preciseid_ews_decision">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="PROCEED" />
+                <xs:enumeration value="DECLINE" />
+                <xs:enumeration value="" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="preciseid_ews_transaction_date" type="xs:date" />
+          <xs:attribute name="overall_severity" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="XPRESS_LOAN">
+    <xs:complexContent mixed="false">
+      <xs:extension base="APP">
+        <xs:sequence>
+          <xs:element name="APPLICANTS">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="APPLICANT" type="XPRESS_APPLICANT" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="COMMENTS">
+            <xs:complexType>
+              <xs:complexContent mixed="false">
+                <xs:extension base="BASE_COMMENTS" />
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="LOAN_INFO" type="XPRESS_LOAN_INFO" />
+          <xs:element minOccurs="0" name="CUSTOM_QUESTIONS" type="BASE_CUSTOM_QUESTIONS" />
+          <xs:element maxOccurs="unbounded" name="SYSTEM" type="XPRESS_SYSTEM" />
+          <xs:element minOccurs="0" name="APPROVED_ACCOUNTS" type="XPRESS_ACCOUNT_TYPES_APPROVED" />
+          <xs:element minOccurs="0" name="INTERESTED_ACCOUNTS">
+            <xs:complexType>
+              <xs:complexContent mixed="false">
+                <xs:extension base="XPRESS_ACCOUNT_TYPES" />
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="FUTURE_ACCOUNTS" type="XPRESS_ACCOUNT_TYPES">
+            <xs:annotation>
+              <xs:documentation>These are the accounts that the member would be interested in opening or learning about in the future.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="TASK_LIST" type="BASE_TASK_LIST" />
+          <xs:element minOccurs="0" name="FUNDING_SOURCES" type="XPRESS_FUNDING_SOURCES" />
+          <xs:element minOccurs="0" name="MEMBERSHIP_FEE" type="XPRESS_MEMBERSHIP_FEE" />
+          <xs:element minOccurs="0" name="BUSINESS_INFO">
+            <xs:annotation>
+              <xs:documentation>Please make sure to set entity_type to BUSINESS if this node is used.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="COMPANY_INFO" type="COMPANY_INFO_TYPE" />
+                <xs:element minOccurs="0" name="DBA_INFO" type="COMPANY_INFO_TYPE" />
+                <xs:element minOccurs="0" name="BUSINESS_ID_INFO">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="BUSINESS_ID">
+                        <xs:complexType>
+                          <xs:attribute name="business_id_type" type="base_business_id_type" />
+                          <xs:attribute name="business_id_number">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="40" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:attribute>
+                          <xs:attribute name="business_id_state">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="2" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:attribute>
+                          <xs:attribute name="business_id_country">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="20" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:attribute>
+                          <xs:attribute name="business_id_expire_date" type="xs:date" />
+                          <xs:attribute name="business_id_date_issued" type="xs:date" />
+                          <xs:attribute name="business_id_verification_date" type="xs:date" />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element minOccurs="0" name="BUSINESS_ID2">
+                        <xs:complexType>
+                          <xs:attribute name="business_id_type" type="base_business_id_type" />
+                          <xs:attribute name="business_id_number">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="40" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:attribute>
+                          <xs:attribute name="business_id_state">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="2" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:attribute>
+                          <xs:attribute name="business_id_country">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="20" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:attribute>
+                          <xs:attribute name="business_id_expire_date" type="xs:date" />
+                          <xs:attribute name="business_id_date_issued" type="xs:date" />
+                          <xs:attribute name="business_id_verification_date" type="xs:date" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="is_dba" type="base_YN" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="DEDUCTIONS">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" name="DEDUCTION" type="DEDUCTION_TYPE" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="BENEFICIARIES">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="BENEFICIARY" type="XPRESS_BENEFICIARY" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="ACCOUNT_FUNDING" type="XPRESS_ACCOUNT_FUNDING">
+            <xs:annotation>
+              <xs:documentation>DO NOT USE, OBSOLETE.  Use the APPROVED_ACCOUNTS/ACCOUNT_TYPE node instead</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="SPECIAL_INFO" type="SPECIAL_INFO" />
+          <xs:element minOccurs="0" name="FOM_ANSWERED_QUESTIONS" type="FOM_ANSWERED_QUESTIONS" />
+          <xs:element minOccurs="0" name="ADDITIONAL_SERVICES">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="INTERNAL_TRANSFER" type="INTERNAL_TRANSFER_TYPE" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="INTEGRATION_DATA_LIST">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="INTEGRATION_DATA" type="INTEGRATION_DATA" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="MODIFICATION_HISTORY" type="BASE_MODIFICATION_HISTORY" />
+          <xs:element minOccurs="0" name="EVENT_HISTORY" type="BASE_EVENT_HISTORY" />
+          <xs:element minOccurs="0" name="WEBMS_HISTORY" type="BASE_WEBMS_HISTORY" />
+          <xs:element minOccurs="0" name="BENEFICIAL_OWNERS" type="BENEFICIAL_OWNERS" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>
